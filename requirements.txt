@@ -1,5 +1,4 @@
 netCDF4
-numpy
 arrow
 
 ###################

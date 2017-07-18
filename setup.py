@@ -1,5 +1,5 @@
 from setuptools import setup, find_packages
-from check_maker import __version__
+from time_checks import __version__
 
 
 def readme():
