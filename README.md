@@ -16,6 +16,7 @@ The full list of checks managed by this package are provided below:
 
 ### Single file tests
 
+````
 temporal_subset must contain two components in the form "start"-"end", separated by "-"
 The structure of "start" and "end" must be of the form yyyy[MM[dd[hh[mm]]]]
 "start" and "end" must have the same the structure
@@ -35,10 +36,11 @@ MM is an integer between 01-12
 dd is an integer between 01-31
 hh is an integer between 00-23
 mm is an integer between 00-59
-
+```
 
 ### Aggregation over multi-file timeseries data
 
+```
 Given a variable level dataset (i.e. a directory of a timeseries
 Continutity - a: Are there any identified gaps in the timeseries	For each "end" the following "start" is the next timestep in the series depending on the temporal resolution 	Check against filename only	Or timestamp?
 Continutity - b: Are there any identified overlaps in the timeseries	For each "end" the following "start" is the next timestep in the series depending on the temporal resolution 	Check against filename only	Or timestamp?
@@ -52,7 +54,7 @@ rcp45	RCP4.5	2006-2300	295
 rcp85	RCP8.5	2006-2300	295
 rcp26	RCP2.6	2006-2300	295
 rcp60	RCP6.0	2006-2100	94
-
+```
 
 ## Installation
 
