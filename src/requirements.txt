@@ -1,0 +1,7 @@
+netCDF4
+numpy
+arrow
+
+###################
+# For testing:
+pytest
