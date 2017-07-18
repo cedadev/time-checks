@@ -65,7 +65,18 @@ To install the package and its dependencies:
 ```
 git clone https://github.com/cedadev/time-checks
 cd time-checks
+virtualenv venv
+echo ". venv/bin/activate" > setup_env.sh
+echo "export PYTHONPATH=." >> setup_env.sh
+
+. setup_env.sh
 python setup.py install
+```
+
+To run tests:
+
+```
+py.test
 ```
 
 
