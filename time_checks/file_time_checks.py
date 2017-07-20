@@ -123,7 +123,7 @@ def check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:
     file_times = [_parse_time(comp) for comp in time_comp.split("-")]
 
     # Get the time variable from the file
-    time_var = ds.variables[time_utils.get_time_variable(ds)] 
+    time_var = time_utils.get_time_variable(ds)
 
     calendar = 'standard'
     if 'calendar' in time_var.ncattrs():

@@ -20,7 +20,6 @@ def test_check_file_name_time_format_fail_1():
     ]
 
     for fname in eg_names:
-        print fname
         mock_ds = MockNCDataset(fname)
         assert(check_file_name_time_format(mock_ds) == False)
 
