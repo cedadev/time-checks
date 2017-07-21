@@ -48,3 +48,11 @@ def test_check_regular_time_axis_increments_success_1():
 
 def test_check_regular_time_axis_increments_fail_1():
     pass
+
+
+def test_check_time_format_matches_frequency_success_1():
+    pass
+
+
+def test_check_time_format_matches_frequency_fail_1():
+    pass

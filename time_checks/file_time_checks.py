@@ -148,3 +148,47 @@ def check_regular_time_axis_increments(ds):
     :return:
     """
     pass
+
+def check_time_format_matches_frequency(ds):
+    """
+    Checks for consistenty between the time frequency and the format of the time
+    variable_table = "fx": time independent data will not have a temporal element
+    variable_table = "yr": yearly data of the form: yyyy
+    variable_table = "mon": monthly data of the form: yyyyMM
+    variable_table = "monClim": monthly climatology data of the form: yyyyMM
+    variable_table = "day": daily data of the form: yyyyMMdd
+    variable_table = "6hr": 6 hourly data of the form: yyyyMMddhh
+    variable_table = "3hr": 3 hourly data of the form: yyyyMMddhhmm
+    variable_table = "subhr": sub-hourly data of the form: yyyyMMddhhmm
+
+    :param ds:
+    :return:
+    """
+    pass
+
+def check_valid_temporal_element(element):
+    """
+    Checks whether the temporal elements are within the valid ranges:
+        years, yyyy: a four digit integer > 0000 (strictly between 1800-2900)
+        months, MM: a two digit integer between 01 and 12
+        days, dd: a two digit integer between 01-31
+        hours, hh: a two digit integer between 00-23
+        minutes, mm: a two digit integer between 00-59
+    :param element:
+    :return:
+    """
+    pass
+
+def check_multifile_temporal_continutity(list_of_time_elements):
+    """
+    Checks the temporal continutity over a list of files.
+    Checks for any gaps or overlaps in the in the timeseries: for each "end" the following "start" is the next
+    timestep in the series depending on the temporal resolution
+
+    Check against filename only	Or timestamp?
+
+    :param list_of_time_elements:
+    :return:
+    """
+
+    pass
