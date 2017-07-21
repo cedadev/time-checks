@@ -140,3 +140,11 @@ def check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:
 
     return True
 
+
+def check_regular_time_axis_increments(ds):
+    """
+    Checks that the time axis increments are at regular intervals
+    :param ds:
+    :return:
+    """
+    pass
