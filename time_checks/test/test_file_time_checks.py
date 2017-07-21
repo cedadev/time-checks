@@ -56,3 +56,27 @@ def test_check_time_format_matches_frequency_success_1():
 
 def test_check_time_format_matches_frequency_fail_1():
     pass
+
+
+def test_check_valid_temporal_element_success_1():
+    pass
+
+
+def test_check_valid_temporal_element_fail_1():
+    pass
+
+
+def test_check_multifile_temporal_continutity_success_1():
+    pass
+
+
+def test_check_multifile_temporal_continutity_fail_1():
+    pass
+
+
+def test_check_multifile_temporal_completeness_success_1():
+    pass
+
+
+def test_check_multifile_temporal_completeness_fail_1():
+    pass
