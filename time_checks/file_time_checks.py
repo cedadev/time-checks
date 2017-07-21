@@ -192,3 +192,17 @@ def check_multifile_temporal_continutity(list_of_time_elements):
     """
 
     pass
+
+
+def check_multifile_temporal_completeness(list_of_time_elements):
+    """
+    Checks the temporal completeness over a list of files.
+    
+    Start to end is continuous
+    For a given experiment is the timeseries complete given the CMIP5 requirements
+
+    :param list_of_time_elements:
+    :return:
+    """
+
+    pass
