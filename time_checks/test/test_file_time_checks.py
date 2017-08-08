@@ -45,14 +45,13 @@ def test_check_file_name_matches_time_var_fail_1():
 def test_check_regular_time_axis_increments_success_1():
     pass
 
-
 def test_check_regular_time_axis_increments_fail_1():
     pass
 
 
 def test_check_time_format_matches_frequency_success_1():
-    pass
-
+    ds = Dataset('/badc/cmip5/data/cmip5/output1/MOHC/HadGEM2-ES/historical/day/land/day/r1i1p1/latest/mrsos/mrsos_day_HadGEM2-ES_historical_r1i1p1_19991201-20051130.nc')
+    assert(check_time_format_matches_frequency(ds, frequency_index=1, time_index_in_name=-1) == True)
 
 def test_check_time_format_matches_frequency_fail_1():
     pass

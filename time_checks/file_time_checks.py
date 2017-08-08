@@ -21,7 +21,9 @@ DT_LENGTHS = ['4', '6', '8', '10', '12', '14']
 
 FILE_NAME_PATTERNS_SINGLE = [r'^\d{{{}}}$'.format(dtl) for dtl in DT_LENGTHS]
 FILE_NAME_PATTERNS_DOUBLE = [r'^\d{{{}}}-\d{{{}}}$'.format(dtl, dtl) for dtl in DT_LENGTHS]
-
+CMOR_TABLES_FORMAT = {'3hr': 12, '6hrLev': 10, '6hrPLev': 10, 'Amon': 6, 'LImon': 6, 'Lmon': 6, 'OImon': 6,
+                      'Omon': 6, 'Oyr': 4, 'aero': 0, 'cf3hr': 12, 'cfDay': 8, 'cfMon': 6, 'cfOff': 0, 'cfSites': 0,
+                      'day': 8, 'fx': 0}
 FILE_NAME_REGEXES = [re.compile(pattn) for pattn in (FILE_NAME_PATTERNS_SINGLE
                                                      + FILE_NAME_PATTERNS_DOUBLE)]
 
@@ -38,6 +40,24 @@ def _extract_time_comp(fpath, time_index_in_name=-1, delimiter="_"):
     fname = os.path.basename(fpath)
     time_comp = os.path.splitext(fname)[0].split("_")[time_index_in_name]
     return time_comp
+
+
+def _extract_temporal_frequency(fpath, frequency_index=1, delimiter="_"):
+    """
+    Extracts the temporal frequency from the file name.
+
+    The temporal frequencies are given as the CMIP5 CMOR tables.
+    See https://github.com/PCMDI/cmip5-cmor-tables/tree/master/Tables
+
+    :param fpath: file path [string]
+    :param time_index_in_name: index of time component in the file name [int]
+    :param delimiter: delimiter in file name [string]
+    :return: The time frequency as a string
+    """
+    fname = os.path.basename(fpath)
+    frequency = os.path.splitext(fname)[0].split('_')[frequency_index]
+    return frequency
+
 
 
 def _parse_time(tm):
@@ -141,15 +161,8 @@ def check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:
     return True
 
 
-def check_regular_time_axis_increments(ds):
-    """
-    Checks that the time axis increments are at regular intervals
-    :param ds:
-    :return:
-    """
-    pass
 
-def check_time_format_matches_frequency(ds):
+def check_time_format_matches_frequency(ds, frequency_index=1, time_index_in_name=-1):
     """
     Checks for consistenty between the time frequency and the format of the time
     variable_table = "fx": time independent data will not have a temporal element
@@ -164,7 +177,26 @@ def check_time_format_matches_frequency(ds):
     :param ds:
     :return:
     """
+    
+    time_comp = _extract_time_comp(ds.filepath(), time_index_in_name=time_index_in_name)
+    frequency = _extract_temporal_frequency(ds.filepath(), frequency_index=frequency_index)
+    print time_comp
+    print len(time_comp.split('-')[0])
+    print frequency
+
+    if len(time_comp.split('-')[0]) == CMOR_TABLES_FORMAT[frequency]:
+        return True
+    
+    return False
+
+def check_regular_time_axis_increments(ds):
+    """
+    Checks that the time axis increments are at regular intervals
+    :param ds:
+    :return:
+    """
     pass
+
 
 def check_valid_temporal_element(element):
     """
