@@ -144,16 +144,13 @@ def check_file_name_time_format(ds, time_index_in_name=-1):
     :param ds: netCDF4 Dataset object.
     :return: boolean (True for success).
     """
-    if isinstance(ds, MockNCDataset):
-        print "MockNCDataset"
+
+    if isinstance(ds, MockNCDataset): time_comp = _extract_filename_component(ds.filepath(), index=time_index_in_name)
+
     if isinstance(ds, Dataset):
         ds, time_var = _convert_dataset_to_dict(ds)
         # GET REQUIRED INFORMATION FROM DICTIONARY
         time_comp = ds['filename'][time_index_in_name]
-
-    else: time_comp = _extract_filename_component(ds.filepath(), index=time_index_in_name)
-
-    print time_comp
 
     # REQUIRED IF WORKING DIRECTLY WITH netCDF4 OBJECTS
     # time_comp = _extract_filename_component(ds.filepath(), index=time_index_in_name)
