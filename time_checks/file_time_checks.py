@@ -287,6 +287,16 @@ def check_valid_temporal_element(ds, time_index_in_name=-1):
 
     return True
 
+def _calculate_detla_time_series(times, valid_dt):
+    t = 0
+    while t < len(times)-1:
+        t_diff = times[t+1] - times[t]
+        if t_diff not in valid_dt:
+            return False
+        else:
+            return True
+
+
 def check_regular_time_axis_increments(ds, frequency_index=1):
     """
     Checks that the time axis increments are at regular intervals
@@ -301,16 +311,17 @@ def check_regular_time_axis_increments(ds, frequency_index=1):
         frequency = ds['filename'][frequency_index]
         times = ds["time"]["_data"]
 
-    delta_t = times[1] -times[0]
-    if frequency == 'mon':
-        # MOnthly frequencies may have irregular intervals test to be implemented
-        pass
+    delta_t = [times[1] -times[0]]
 
-        t = 1
-        while t < len(times):
-            t_diff = times[t+1] - t[t]
-            if t_diff != delta_t:
-                return False
+    # For all calendars proleptic_gregorian, noleap, 365_day, standard, gregorian,
+    irregular_mon_cals = ['gregorian', 'proleptic_gregorian', 'julian', 'noleap', '365_day', 'standard']
+    VALID_MONTHLY_TIME_DIFFERENCES = [29.5, 30.5, 31.0]
+
+    if frequency == 'mon' and calendar in irregular_mon_cals:
+        res = _calculate_detla_time_series(times, VALID_MONTHLY_TIME_DIFFERENCES)
+
+    else:
+        res = _calculate_detla_time_series(times, delta_t)
 
     return True
 
