@@ -9,9 +9,13 @@ from netCDF4 import Dataset
 
 from time_checks.file_time_checks import *
 from time_checks.test.mock_netcdf import MockNCDataset
+from time_checks import settings
 
+# INCLUDE MockNCDataset in supported settings
+settings.supported_datasets.append(MockNCDataset)
 
 def test_check_file_name_time_format_fail_1():
+
     eg_names = [
         "mrsos_day_HadGEM2-ES_historical_r1i1p1_19991201-2005.nc",
         "hopeful",

@@ -15,7 +15,7 @@ from time_checks.test.mock_netcdf import MockNCDataset
 import arrow
 
 from time_checks import time_utils 
-
+from time_checks import settings
 
 # File name regular expressions for different time component patterns
 DT_LENGTHS = ['4', '6', '8', '10', '12', '14']
@@ -68,7 +68,7 @@ def _convert_dataset_to_dict(ds):
     }
 
     filename_info = os.path.splitext(os.path.basename(ds.filepath()))[0].split("_")
-    return {"time": d, "filename": filename_info}, time_var
+    return {"time": d, "filename": filename_info}
 
 
 # THIS FUNCTION IS ONLY REQUIRED IF WORKING DIRECTLY WITH netCDF4 OBJECTS OR MockNCDatasets
@@ -148,7 +148,7 @@ def check_file_name_time_format(ds, time_index_in_name=-1):
     if isinstance(ds, MockNCDataset): time_comp = _extract_filename_component(ds.filepath(), index=time_index_in_name)
 
     if isinstance(ds, Dataset):
-        ds, time_var = _convert_dataset_to_dict(ds)
+        ds = _convert_dataset_to_dict(ds)
         # GET REQUIRED INFORMATION FROM DICTIONARY
         time_comp = ds['filename'][time_index_in_name]
 
@@ -174,8 +174,10 @@ def check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:
     :param tolerance: tolerance of time difference allowed in match [string]
     :return: boolean (True for success).
     """
+    time_var = time_utils.get_time_variable(ds)
+    if type(ds) in settings.supported_datasets: ds = _convert_dataset_to_dict(ds)
 
-    if isinstance(ds, Dataset): ds, time_var = _convert_dataset_to_dict(ds)
+#    if isinstance(ds, Dataset): ds = _convert_dataset_to_dict(ds)
 
     # REQUIRED IF WORKING DIRECTLY WITH netCDF4 OBJECTS
     # time_comp = _extract_filename_component(ds.filepath(), index=time_index_in_name)
@@ -185,6 +187,7 @@ def check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:
     #     calendar = time_var.calendar
 
     # GET REQUIRED INFORMATION FROM DICTIONARY
+
     time_comp = ds['filename'][time_index_in_name]
     calendar = ds["time"]["calendar"]
 
@@ -292,7 +295,7 @@ def check_regular_time_axis_increments(ds, frequency_index=1):
     """
 
     if isinstance(ds, Dataset):
-        ds, time_var = _convert_dataset_to_dict(ds)
+        ds = _convert_dataset_to_dict(ds)
 
         calendar = ds["time"]["calendar"]
         frequency = ds['filename'][frequency_index]
@@ -305,7 +308,7 @@ def check_regular_time_axis_increments(ds, frequency_index=1):
 
         t = 1
         while t < len(times):
-            t_diff = times[t] - t[t+1]
+            t_diff = times[t+1] - t[t]
             if t_diff != delta_t:
                 return False
 
