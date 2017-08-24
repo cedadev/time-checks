@@ -299,9 +299,19 @@ def _calculate_detla_time_series(times, valid_dt):
 
 def check_regular_time_axis_increments(ds, frequency_index=1):
     """
-    Checks that the time axis increments are at regular intervals
-    :param ds:
-    :return:
+    check_regular_time_axis_increments
+
+    This routine checks that the given time axis increments for a given file are regularly spaced throughout.
+
+    Since it is common to have the timestamp of monthly data placed at the middle of month,
+    monthly CMIP5 maybe irregularly spaced when using any of the following calendars:
+        'gregorian', 'proleptic_gregorian', 'julian', 'noleap', '365_day', 'standard',
+    For these calendars valid time axis increments are 29.5, 30.5 and 31 days.
+
+    :param ds: netCDF4 Dataset object or compliant dictionary object
+    :param frequency_index: index of the frequency element in the filename
+                            (actually the cmor table, frequency must be implied from this)
+    :return: Boolean True/False
     """
 
     if isinstance(ds, Dataset):
@@ -325,19 +335,100 @@ def check_regular_time_axis_increments(ds, frequency_index=1):
 
     return True
 
-def check_multifile_temporal_continutity(list_of_time_elements):
+
+def check_multifile_temporal_continutity(dss, time_index_in_name=-1, frequency_index=1):
     """
-    Checks the temporal continutity over a list of files.
-    Checks for any gaps or overlaps in the in the timeseries: for each "end" the following "start" is the next
-    timestep in the series depending on the temporal resolution
+    check_multifile_temporal_continutity:
 
-    Check against filename only	Or timestamp?
+    This routine checks for the temporal continutiy over a given number of datafiles.
 
-    :param list_of_time_elements:
-    :return:
+    The test is checks that for each file in a timeseries
+    that the start time of given in the filename is one timestep ahead of the end time
+    of the previous file in the timeseries.
+
+    This test checks that from the start for a given timeseries that
+        (1) there are no jumps in the timeseries
+        (2) there are no missing timesteps in the timesesries
+        (3) that the set is complete, i.e. it is continuous from file 0:n by fullfilling (1) and (2)
+
+    To ensure that the timeseries metadata meet all requirements use this routine in conjunction with
+    the other tests defined here.
+
+    :param dss: list of netCDF4 Dataset objects or compliant dictionary objects
+    :param time_index_in_name: index of the time index in the filename
+    :param frequency_index: index of the frequency element in the filename
+                            (actually the cmor table, frequency must be implied from this)
+
+    :return: Boolean True/False
     """
 
-    pass
+    # The files must be provided in order at present?
+    #
+    # TODO: USE ARROW TO RE-ORDER
+
+    file_times = []
+    for ds in dss:
+        if isinstance(ds, Dataset):
+            ds = _convert_dataset_to_dict(ds)
+
+            # GET REQUIRED INFORMATION FROM DICTIONARY
+            time_comp = ds['filename'][time_index_in_name]
+            frequency = ds['filename'][frequency_index]
+        else:
+            # REQUIRED IF WORKING WITH netCDF4 OBJECTS OR MockNCDatasets
+            time_comp = _extract_filename_component(ds.filepath(), index=time_index_in_name)
+            frequency = _extract_filename_component(ds.filepath(), index=frequency_index)
+        file_times.append([_parse_time(comp) for comp in time_comp.split("-")])
+
+  #  import pdb; pdb.set_trace()
+
+
+    srt_i = 0; end_i = 1
+    ntimes = 0
+    print frequency
+    while ntimes < len(file_times) - 1:
+        end = file_times[ntimes][end_i]
+        start = file_times[ntimes+1][srt_i]
+        if frequency in ["3hr", "cf3hr"]:
+            if end.shift(hours=3) != start: return False
+        if frequency in ["6hrLev", "6hrPLev"]:
+            if end.shift(hours=6) != start: return False
+        if frequency in ["day", "cfDay"]:
+            if end.shift(days=1) != start: return False
+        if frequency in ["Amon", "Omon", "OImon", "Lmon", "LImon", "cfMon"]:
+            if end.shift(months=1) != start: return False
+        if frequency in ["yr", "Oyr"]:
+            if end.shift(years=1) != start: return False
+        ntimes += 1
+
+
+    return True
+
+
+
+
+    #
+    # datafile_times = {}
+    # for ds in dss:
+    #
+    #     if isinstance(ds, Dataset):
+    #         ds = _convert_dataset_to_dict(ds)
+    #
+    #         # GET REQUIRED INFORMATION FROM DICTIONARY
+    #         time_comp = ds['filename'][time_index_in_name]
+    #
+    #     else:
+    #         # REQUIRED IF WORKING WITH netCDF4 OBJECTS OR MockNCDatasets
+    #         time_comp = _extract_filename_component(ds.filepath(), index=time_index_in_name)
+    #
+    #     file_times = [_parse_time(comp) for comp in time_comp.split("-")]
+    #     print file_times
+    #     # times = num2date([time_var[0], time_var[-1]], time_var.units, calendar=calendar)
+    #     datafile_times["start"], datafile_times["end"] = [arrow.get(tm.strftime()) for tm in file_times]
+    #
+    # print datafile_times
+    #
+    # return True
 
 
 def check_multifile_temporal_completeness(list_of_time_elements):

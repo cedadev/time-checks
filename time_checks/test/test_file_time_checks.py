@@ -109,12 +109,33 @@ def test_check_valid_temporal_element_fail_1():
         assert(check_valid_temporal_element(mock_ds, time_index_in_name=-1) == False)
 
 
-# def test_check_multifile_temporal_continutity_success_1():
-#     pass
-#
-#
-# def test_check_multifile_temporal_continutity_fail_1():
-#     pass
+def test_check_multifile_temporal_continutity_success_1():
+    eg_names = ['tas_Amon_HadGEM2-ES_historical_r1i1p1_185912-188411.nc',
+                'tas_Amon_HadGEM2-ES_historical_r1i1p1_188412-190911.nc',
+                'tas_Amon_HadGEM2-ES_historical_r1i1p1_190912-193411.nc',
+                'tas_Amon_HadGEM2-ES_historical_r1i1p1_193412-195911.nc',
+                'tas_Amon_HadGEM2-ES_historical_r1i1p1_195912-198411.nc',
+                'tas_Amon_HadGEM2-ES_historical_r1i1p1_198412-200511.nc']
+
+    mock_dss = []
+    for fname in eg_names:
+        mock_dss.append(MockNCDataset(fname))
+
+    assert(check_multifile_temporal_continutity(mock_dss, time_index_in_name=-1) == True)
+
+def test_check_multifile_temporal_continutity_fail_1():
+    eg_names = ['tas_Amon_HadGEM2-ES_historical_r1i1p1_185912-188411.nc',
+                'tas_Amon_HadGEM2-ES_historical_r1i1p1_188412-190911.nc',
+                'tas_Amon_HadGEM2-ES_historical_r1i1p1_190912-193411.nc',
+                'tas_Amon_HadGEM2-ES_historical_r1i1p1_193412-195911.nc',
+                'tas_Amon_HadGEM2-ES_historical_r1i1p1_195912-198411.nc',
+                'tas_Amon_HadGEM2-ES_historical_r1i1p1_198512-200511.nc']
+
+    mock_dss = []
+    for fname in eg_names:
+        mock_dss.append(MockNCDataset(fname))
+
+    assert(check_multifile_temporal_continutity(mock_dss, time_index_in_name=-1) == False)
 #
 #
 # def test_check_multifile_temporal_completeness_success_1():
