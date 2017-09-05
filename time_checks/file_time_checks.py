@@ -72,9 +72,16 @@ def _convert_dataset_to_dict(ds):
     :return: key file metadata [dictionary]
     """
 
-    # time_var = ds.variables["time"]
+    """
+    The time_var is retrieved using the get_time_variable function from the time_utils code 
+    this allows for a temporal axis that does not use the standard name "time". 
+    time_var is a netCDF4 variable and therefore has the netCDF4 variable attributes used here:
+        dtype, bounds, long_name, standard_name, units, calendar, axis
+    """
     time_var = time_utils.get_time_variable(ds)
-    d = {
+
+
+    time_dict = {
         "_type": time_var.dtype.name,
         "bounds": _get_nc_attr(time_var, "bounds"),
         "long_name": _get_nc_attr(time_var, "long_name"),
@@ -86,7 +93,9 @@ def _convert_dataset_to_dict(ds):
     }
 
     filename_info = os.path.splitext(os.path.basename(ds.filepath()))[0].split("_")
-    return {"time": d, "filename": filename_info}
+
+    # Returns a dictonary of temporal axis information that is in the same form as used by CEDA-CC
+    return {"time": time_dict, "filename": filename_info}
 
 
 # THIS FUNCTION IS ONLY REQUIRED IF WORKING DIRECTLY WITH netCDF4 OBJECTS OR MockNCDatasets
