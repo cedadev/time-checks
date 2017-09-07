@@ -14,7 +14,12 @@ from time_checks import settings
 # INCLUDE MockNCDataset in supported settings
 settings.supported_datasets.append(MockNCDataset)
 
+
+
+
 def test_check_file_name_time_format_fail_1():
+
+    print settings.supported_datasets
 
     eg_names = [
         "mrsos_day_HadGEM2-ES_historical_r1i1p1_19991201-2005.nc",

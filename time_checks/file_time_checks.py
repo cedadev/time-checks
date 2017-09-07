@@ -183,6 +183,7 @@ def _calculate_detla_time_series(times, valid_dt):
     :param valid_dt: Valid time difference, usually scalar, list of valid times supported
     :return: boolean [True for success]
     """
+
     t = 0
     while t < len(times) - 1:
         t_diff = times[t + 1] - times[t]
@@ -208,13 +209,18 @@ def check_file_name_time_format(ds, time_index_in_name=-1):
     :param time_index_in_name: index of time component in the file name [int]
     :return: boolean (True for success).
     """
-
-    if isinstance(ds, MockNCDataset): time_comp = _extract_filename_component(ds.filepath(), index=time_index_in_name)
+    
+    if type(ds) in settings.supported_datasets:
+        time_comp = _extract_filename_component(ds.filepath(), index=time_index_in_name)
 
     if isinstance(ds, Dataset):
         ds = _convert_dataset_to_dict(ds)
         # GET REQUIRED INFORMATION FROM DICTIONARY
         time_comp = ds['filename'][time_index_in_name]
+
+    # else
+        # rasie exception "Unsupported data type. Data types supported are netCDF4 objects or CEDA-CC compliant dictionary objects"
+
 
     # REQUIRED IF WORKING DIRECTLY WITH netCDF4 OBJECTS
     # time_comp = _extract_filename_component(ds.filepath(), index=time_index_in_name)
