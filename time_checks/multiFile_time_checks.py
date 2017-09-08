@@ -67,22 +67,31 @@ def check_multifile_temporal_continutity(dss, time_index_in_name=-1, frequency_i
         time_comp = ds['filename'][time_index_in_name]
         frequency = ds['filename'][frequency_index]
         file_times.append([_parse_time(comp) for comp in time_comp.split("-")])
+        sorted_times = sorted(file_times)
 
     srt_i = 0; end_i = 1
     ntimes = 0
-    while ntimes < len(file_times) - 1:
-        end = file_times[ntimes][end_i]
-        start = file_times[ntimes+1][srt_i]
-        if frequency in ["3hr", "cf3hr"]:
-            if end.shift(hours=3) != start: return False
-        if frequency in ["6hrLev", "6hrPLev"]:
-            if end.shift(hours=6) != start: return False
-        if frequency in ["day", "cfDay"]:
-            if end.shift(days=1) != start: return False
-        if frequency in ["Amon", "Omon", "OImon", "Lmon", "LImon", "cfMon"]:
-            if end.shift(months=1) != start: return False
+
+    while ntimes < len(sorted_times) - 1:
+
+        # Get end time of one file and start of next
+        end = sorted_times[ntimes][end_i]
+        start = sorted_times[ntimes+1][srt_i]
+
         if frequency in ["yr", "Oyr"]:
             if end.shift(years=1) != start: return False
+        elif frequency in ["Amon", "Omon", "OImon", "Lmon", "LImon", "cfMon"]:
+            if end.shift(months=1) != start: return False
+        elif frequency in ["day", "cfDay"]:
+            if end.shift(days=1) != start: return False
+        elif frequency in ["3hr", "cf3hr"]:
+            if end.shift(hours=3) != start: return False
+        elif frequency in ["6hrLev", "6hrPLev"]:
+            if end.shift(hours=6) != start: return False
+
+        else:
+            raise Exception("Frequency of unknown format, must be a CMIP5 table format")
+
         ntimes += 1
 
     return True
