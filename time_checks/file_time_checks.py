@@ -30,6 +30,36 @@ CMOR_TABLES_FORMAT = {'3hr': 12, '6hrLev': 10, '6hrPLev': 10, 'Amon': 6, 'LImon'
 IRREGULAR_MONTHLY_CALENDARS = ['gregorian', 'proleptic_gregorian', 'julian', 'noleap', '365_day', 'standard']
 VALID_MONTHLY_TIME_DIFFERENCES = [29.5, 30.5, 31.0]
 
+
+def _resolve_dataset_type(ds):
+    """
+    _resolve_dataset_type
+
+    This funtion analyses type of dataset (ds)
+        - a netCDF4 Dataset
+        - a MockNCDataset - used in testing only
+        - a compliant dictionary in the form used by this class
+          and used to interface with CEDA-CC
+
+
+    :param ds: a dataset object [type anyalysed in this routine]
+    :return: ds [dictonary]
+    """
+
+    if type(ds) in settings.supported_datasets:
+        # If ds is a netCDF4 object
+        # (or in testing mode a MockNCDatset)
+        # then it is converted to a dictionary format
+        ds = _convert_dataset_to_dict(ds)
+    elif isinstance(ds, dict):
+        # TODO: Check dictionary is of valid form
+        pass
+    else:
+        raise Exception("Unsupported data type. "
+                        "Data types supported are netCDF4 objects or CEDA-CC compliant dictionary objects")
+
+    return ds
+
 def _get_nc_attr(var, attr, default=""):
     """
     _get_nc_attr
@@ -209,21 +239,9 @@ def check_file_name_time_format(ds, time_index_in_name=-1):
     :param time_index_in_name: index of time component in the file name [int]
     :return: boolean (True for success).
     """
-    
-    if type(ds) in settings.supported_datasets:
-        time_comp = _extract_filename_component(ds.filepath(), index=time_index_in_name)
 
-    if isinstance(ds, Dataset):
-        ds = _convert_dataset_to_dict(ds)
-        # GET REQUIRED INFORMATION FROM DICTIONARY
-        time_comp = ds['filename'][time_index_in_name]
-
-    # else
-        # rasie exception "Unsupported data type. Data types supported are netCDF4 objects or CEDA-CC compliant dictionary objects"
-
-
-    # REQUIRED IF WORKING DIRECTLY WITH netCDF4 OBJECTS
-    # time_comp = _extract_filename_component(ds.filepath(), index=time_index_in_name)
+    ds = _resolve_dataset_type(ds)
+    time_comp = ds['filename'][time_index_in_name]
 
     for regex in FILE_NAME_REGEXES:
         if regex.match(time_comp):
@@ -246,20 +264,9 @@ def check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:
     :param tolerance: tolerance of time difference allowed in match [string]
     :return: boolean [True for success]
     """
-    time_var = time_utils.get_time_variable(ds)
-    if type(ds) in settings.supported_datasets: ds = _convert_dataset_to_dict(ds)
 
-#    if isinstance(ds, Dataset): ds = _convert_dataset_to_dict(ds)
-
-    # REQUIRED IF WORKING DIRECTLY WITH netCDF4 OBJECTS
-    # time_comp = _extract_filename_component(ds.filepath(), index=time_index_in_name)
-    # time_var = time_utils.get_time_variable(ds)
-    # calendar = 'standard'
-    # if 'calendar' in time_var.ncattrs():
-    #     calendar = time_var.calendar
-
-    # GET REQUIRED INFORMATION FROM DICTIONARY
-
+    ds = _resolve_dataset_type(ds)
+    time_var = ds["time"]["_data"]
     time_comp = ds['filename'][time_index_in_name]
     calendar = ds["time"]["calendar"]
 
@@ -298,16 +305,9 @@ def check_time_format_matches_frequency(ds, frequency_index=1, time_index_in_nam
     :return: boolean [True for success]
     """
 
-    if isinstance(ds, Dataset):
-        ds = _convert_dataset_to_dict(ds)
-
-        # GET REQUIRED INFORMATION FROM DICTIONARY
-        time_comp = ds['filename'][time_index_in_name]
-        frequency = ds['filename'][frequency_index]
-    else:
-        # REQUIRED IF WORKING WITH netCDF4 objects or MockNCDatasets
-        time_comp = _extract_filename_component(ds.filepath(), index=time_index_in_name)
-        frequency = _extract_filename_component(ds.filepath(), index=frequency_index)
+    ds = _resolve_dataset_type(ds)
+    time_comp = ds['filename'][time_index_in_name]
+    frequency = ds['filename'][frequency_index]
 
     if len(time_comp.split('-')[0]) == CMOR_TABLES_FORMAT[frequency]:
         return True
@@ -331,15 +331,9 @@ def check_valid_temporal_element(ds, time_index_in_name=-1):
     :return: boolean [True for success]
     """
 
-    if isinstance(ds, Dataset):
-        ds = _convert_dataset_to_dict(ds)
-
-        # GET REQUIRED INFORMATION FROM DICTIONARY
-        time_comp = ds['filename'][time_index_in_name]
-
-    else:
-        # REQUIRED IF WORKING WITH netCDF4 OBJECTS OR MockNCDatasets
-        time_comp = _extract_filename_component(ds.filepath(), index=time_index_in_name)
+    ds = _resolve_dataset_type(ds)
+    time_comp = ds['filename'][time_index_in_name]
+    frequency = ds['filename'][frequency_index]
 
     for time_element in time_comp.split('-'):
         length_time = len(time_element)
@@ -387,12 +381,10 @@ def check_regular_time_axis_increments(ds, frequency_index=1):
     :return: boolean [True for success]
     """
 
-    if isinstance(ds, Dataset):
-        ds = _convert_dataset_to_dict(ds)
-
-        calendar = ds["time"]["calendar"]
-        frequency = ds['filename'][frequency_index]
-        times = ds["time"]["_data"]
+    ds = _resolve_dataset_type(ds)
+    frequency = ds['filename'][frequency_index]
+    calendar = ds["time"]["calendar"]
+    times = ds["time"]["_data"]
 
     delta_t = [times[1] -times[0]]
 
