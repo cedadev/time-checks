@@ -46,10 +46,11 @@ def _resolve_dataset_type(ds):
     :return: ds [dictonary]
     """
 
-    if type(ds) in settings.supported_datasets:
-        # If ds is a netCDF4 object
-        # (or in testing mode a MockNCDatset)
-        # then it is converted to a dictionary format
+    # First if clause required for testing only - will remove in due course
+    if isinstance(ds, MockNCDataset):
+        ds = {"time": [],
+              "filename": os.path.splitext(os.path.basename(ds.filepath()))[0].split("_")}
+    elif isinstance(ds, Dataset):
         ds = _convert_dataset_to_dict(ds)
     elif isinstance(ds, dict):
         # TODO: Check dictionary is of valid form
@@ -101,7 +102,6 @@ def _convert_dataset_to_dict(ds):
     :param ds: a netCDF4 Dataset object [netCDF4 Dataset object]
     :return: key file metadata [dictionary]
     """
-
     """
     The time_var is retrieved using the get_time_variable function from the time_utils code 
     this allows for a temporal axis that does not use the standard name "time". 
@@ -109,8 +109,6 @@ def _convert_dataset_to_dict(ds):
         dtype, bounds, long_name, standard_name, units, calendar, axis
     """
     time_var = time_utils.get_time_variable(ds)
-
-
     time_dict = {
         "_type": time_var.dtype.name,
         "bounds": _get_nc_attr(time_var, "bounds"),
@@ -124,8 +122,10 @@ def _convert_dataset_to_dict(ds):
 
     filename_info = os.path.splitext(os.path.basename(ds.filepath()))[0].split("_")
 
-    # Returns a dictonary of temporal axis information that is in the same form as used by CEDA-CC
-    return {"time": time_dict, "filename": filename_info}
+    dict = {"time": time_dict, "filename": filename_info}
+
+    # Returns a dictionary of temporal axis information that is in the same form as used by CEDA-CC
+    return dict
 
 
 def _parse_time(tm):
@@ -253,7 +253,7 @@ def check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:
     calendar = ds["time"]["calendar"]
 
     file_times = [_parse_time(comp) for comp in time_comp.split("-")]
-    times = num2date([time_var[0], time_var[-1]], time_var.units, calendar=calendar)
+    times = num2date([time_var[0], time_var[-1]], ds["time"]["units"], calendar=calendar)
     t_start, t_end = [arrow.get(tm.strftime()) for tm in times]
  
     if not _times_match_within_tolerance(t_start, file_times[0], tolerance): 
@@ -313,7 +313,6 @@ def check_valid_temporal_element(ds, time_index_in_name=-1):
 
     ds = _resolve_dataset_type(ds)
     time_comp = ds['filename'][time_index_in_name]
-    frequency = ds['filename'][frequency_index]
 
     for time_element in time_comp.split('-'):
         length_time = len(time_element)

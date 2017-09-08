@@ -1,5 +1,5 @@
 """
-multi-file_time_tests.py
+multiFile_time_checks.py
 ==================
 
 A set of tests that operate at the file level.
@@ -16,6 +16,7 @@ import arrow
 
 from time_checks import time_utils
 from time_checks import settings
+from time_checks.file_time_checks import _resolve_dataset_type, _parse_time
 
 # File name regular expressions for different time component patterns
 DT_LENGTHS = ['4', '6', '8', '10', '12', '14']
@@ -62,16 +63,9 @@ def check_multifile_temporal_continutity(dss, time_index_in_name=-1, frequency_i
 
     file_times = []
     for ds in dss:
-        if isinstance(ds, Dataset):
-            ds = _convert_dataset_to_dict(ds)
-
-            # GET REQUIRED INFORMATION FROM DICTIONARY
-            time_comp = ds['filename'][time_index_in_name]
-            frequency = ds['filename'][frequency_index]
-        else:
-            # REQUIRED IF WORKING WITH netCDF4 OBJECTS OR MockNCDatasets
-            time_comp = _extract_filename_component(ds.filepath(), index=time_index_in_name)
-            frequency = _extract_filename_component(ds.filepath(), index=frequency_index)
+        ds = _resolve_dataset_type(ds)
+        time_comp = ds['filename'][time_index_in_name]
+        frequency = ds['filename'][frequency_index]
         file_times.append([_parse_time(comp) for comp in time_comp.split("-")])
 
     srt_i = 0; end_i = 1
