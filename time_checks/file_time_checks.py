@@ -181,30 +181,6 @@ def _times_match_within_tolerance(t1, t2, tolerance="days:1"):
     return False
 
 
-def _calculate_detla_time_series(times, valid_dt):
-    """
-       _calculate_detla_time_series
-
-    This function calculates the differences between all the elements of a timeseries and
-    compares the differences with a valid time difference.
-
-    True is returned if all the differences are valid; i.e. equal to the valid time difference argument
-    False is returned if any of the difference fail to match the valid the time difference argument
-
-    :param times: List of times
-    :param valid_dt: Valid time difference, usually scalar, list of valid times supported
-    :return: boolean [True for success]
-    """
-
-    t = 0
-    while t < len(times) - 1:
-        t_diff = times[t + 1] - times[t]
-        if t_diff not in valid_dt:
-            return False
-        else:
-            return True
-
-
 def check_file_name_time_format(ds, time_index_in_name=-1):
     """
         check_file_name_time_format
@@ -341,6 +317,29 @@ def check_valid_temporal_element(ds, time_index_in_name=-1):
 
     return True
 
+def calculate_detlat_time_series(times, valid_dt):
+    """
+       _calculate_detla_time_series
+
+    This function calculates the differences between all the elements of a timeseries and
+    compares the differences with a valid time difference.
+
+    True is returned if all the differences are valid; i.e. equal to the valid time difference argument
+    False is returned if any of the difference fail to match the valid the time difference argument
+
+    :param times: List of times
+    :param valid_dt: Valid time difference, usually scalar, list of valid times supported
+    :return: boolean [True for success]
+    """
+
+    t = 0
+    while t < len(times) - 1:
+        t_diff = times[t + 1] - times[t]
+        if t_diff not in valid_dt:
+            return False
+        else:
+            return True
+
 
 def check_regular_time_axis_increments(ds, frequency_index=1):
     """
@@ -364,12 +363,12 @@ def check_regular_time_axis_increments(ds, frequency_index=1):
     calendar = ds["time"]["calendar"]
     times = ds["time"]["_data"]
 
-    delta_t = [times[1] -times[0]]
+    delta_t = [times[1] - times[0]]
 
     if frequency == 'mon' and calendar in IRREGULAR_MONTHLY_CALENDARS:
-        res = _calculate_detla_time_series(times, VALID_MONTHLY_TIME_DIFFERENCES)
+        true_or_false = calculate_detlat_time_series(times, VALID_MONTHLY_TIME_DIFFERENCES)
 
     else:
-        res = _calculate_detla_time_series(times, delta_t)
+        true_or_false = calculate_detlat_time_series(times, delta_t)
 
-    return res
+    return true_or_false
