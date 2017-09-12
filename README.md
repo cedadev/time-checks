@@ -16,7 +16,7 @@ The full list of checks managed by this package are provided below:
 
 ### Single file tests
 
-````
+```
 temporal_subset must contain two components in the form "start"-"end", separated by "-"
 The structure of "start" and "end" must be of the form yyyy[MM[dd[hh[mm]]]]
 "start" and "end" must have the same the structure
@@ -40,13 +40,13 @@ mm is an integer between 00-59
 
 ### Aggregation over multi-file timeseries data
 
-```
 Given a variable level dataset (i.e. a directory of a timeseries
 Continutity - a: Are there any identified gaps in the timeseries	For each "end" the following "start" is the next timestep in the series depending on the temporal resolution 	Check against filename only	Or timestamp?
 Continutity - b: Are there any identified overlaps in the timeseries	For each "end" the following "start" is the next timestep in the series depending on the temporal resolution 	Check against filename only	Or timestamp?
 Completeness: start to end is continuous
 Completeness: For a given experiment is the timeseries complete (given the CMIP5 requirements below)
 
+```
 Short Name of Experiment 	 Experiment Name	Temporal constraints	Years requested per run
 piControl	pre-industrial control		>= 500
 historical	historical 	1850-2005	156
