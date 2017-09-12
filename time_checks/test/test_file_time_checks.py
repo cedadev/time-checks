@@ -10,7 +10,7 @@ from netCDF4 import Dataset
 from time_checks.file_time_checks import *
 from time_checks.multiFile_time_checks import *
 from time_checks.test.mock_netcdf import MockNCDataset
-from time_checks import settings
+from time_checks import utils, time_utils, settings, constants
 
 # INCLUDE MockNCDataset in supported settings
 settings.supported_datasets.append(MockNCDataset)

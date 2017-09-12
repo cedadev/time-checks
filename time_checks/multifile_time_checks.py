@@ -6,16 +6,17 @@ A set of tests that operate at the file level.
 
 """
 
+
 import os
 import re
+import arrow
 
 from datetime import datetime, timedelta
 from netCDF4 import Dataset, num2date
-from time_checks.test.mock_netcdf import MockNCDataset
-import arrow
 
-from time_checks import utils, time_utils, settings
-from time_checks.file_time_checks import _resolve_dataset_type, _parse_time
+from time_checks.test.mock_netcdf import MockNCDataset
+from time_checks import utils, time_utils, settings, constants
+
 
 
 def check_multifile_temporal_continutity(dss, time_index_in_name=-1, frequency_index=1):
