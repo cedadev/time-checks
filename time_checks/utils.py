@@ -1,12 +1,10 @@
-import os
-import re
 
+import os, re, arrow
 from datetime import datetime, timedelta
 from netCDF4 import Dataset, num2date
-from time_checks.test.mock_netcdf import MockNCDataset
-import arrow
 
-from time_checks import utils, time_utils, settings
+from time_checks.test.mock_netcdf import MockNCDataset
+from time_checks import time_utils, settings, constants
 
 def _resolve_dataset_type(ds):
     """
@@ -24,14 +22,15 @@ def _resolve_dataset_type(ds):
     """
 
     # First if clause required for testing only - will remove in due course
-    if isinstance(ds, MockNCDataset):
+    if isinstance(ds, Dataset):
+        ds = _convert_dataset_to_dict(ds)
+    elif hasattr(ds, 'filepath'):
         ds = {"time": [],
               "filename": os.path.splitext(os.path.basename(ds.filepath()))[0].split("_")}
-    elif isinstance(ds, Dataset):
-        ds = _convert_dataset_to_dict(ds)
     elif isinstance(ds, dict):
         # TODO: Check dictionary is of valid form
         pass
+
     else:
         raise Exception("Unsupported data type. "
                         "Data types supported are netCDF4 objects or CEDA-CC compliant dictionary objects")

@@ -7,10 +7,7 @@ A set of tests that operate at the file level.
 """
 
 
-import os
-import re
-import arrow
-
+import os, re, arrow
 from datetime import datetime, timedelta
 from netCDF4 import Dataset, num2date
 
@@ -47,10 +44,10 @@ def check_multifile_temporal_continutity(dss, time_index_in_name=-1, frequency_i
 
     file_times = []
     for ds in dss:
-        ds = _resolve_dataset_type(ds)
+        ds = utils._resolve_dataset_type(ds)
         time_comp = ds['filename'][time_index_in_name]
         frequency = ds['filename'][frequency_index]
-        file_times.append([_parse_time(comp) for comp in time_comp.split("-")])
+        file_times.append([utils._parse_time(comp) for comp in time_comp.split("-")])
         sorted_times = sorted(file_times)
 
     srt_i = 0; end_i = 1

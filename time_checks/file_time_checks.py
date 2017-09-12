@@ -6,14 +6,11 @@ A set of tests that operate at the file level.
 
 """
 
-import os
-import re
-
+import os, re, arrow
 from datetime import datetime, timedelta
 from netCDF4 import Dataset, num2date
-from time_checks.test.mock_netcdf import MockNCDataset
-import arrow
 
+from time_checks.test.mock_netcdf import MockNCDataset
 from time_checks import utils, time_utils, settings, constants
 
 def check_file_name_time_format(ds, time_index_in_name=-1):
@@ -33,10 +30,10 @@ def check_file_name_time_format(ds, time_index_in_name=-1):
     :return: boolean (True for success).
     """
 
-    ds = _resolve_dataset_type(ds)
+    ds = utils._resolve_dataset_type(ds)
     time_comp = ds['filename'][time_index_in_name]
 
-    for regex in FILE_NAME_REGEXES:
+    for regex in constants.FILE_NAME_REGEXES:
         if regex.match(time_comp):
             return True
 
@@ -58,19 +55,19 @@ def check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:
     :return: boolean [True for success]
     """
 
-    ds = _resolve_dataset_type(ds)
+    ds = utils._resolve_dataset_type(ds)
     time_var = ds["time"]["_data"]
     time_comp = ds['filename'][time_index_in_name]
     calendar = ds["time"]["calendar"]
 
-    file_times = [_parse_time(comp) for comp in time_comp.split("-")]
+    file_times = [ utils._parse_time(comp) for comp in time_comp.split("-")]
     times = num2date([time_var[0], time_var[-1]], ds["time"]["units"], calendar=calendar)
     t_start, t_end = [arrow.get(tm.strftime()) for tm in times]
- 
-    if not _times_match_within_tolerance(t_start, file_times[0], tolerance): 
+
+    if not utils._times_match_within_tolerance(t_start, file_times[0], tolerance):
         return False
 
-    if not _times_match_within_tolerance(t_end, file_times[1], tolerance):
+    if not utils._times_match_within_tolerance(t_end, file_times[1], tolerance):
         return False
 
     return True
@@ -97,13 +94,13 @@ def check_time_format_matches_frequency(ds, frequency_index=1, time_index_in_nam
     :return: boolean [True for success]
     """
 
-    ds = _resolve_dataset_type(ds)
+    ds = utils._resolve_dataset_type(ds)
     time_comp = ds['filename'][time_index_in_name]
     frequency = ds['filename'][frequency_index]
 
-    if len(time_comp.split('-')[0]) == CMOR_TABLES_FORMAT[frequency]:
+    if len(time_comp.split('-')[0]) == constants.CMOR_TABLES_FORMAT[frequency]:
         return True
-    
+
     return False
 
 
@@ -122,7 +119,7 @@ def check_valid_temporal_element(ds, time_index_in_name=-1):
     :return: boolean [True for success]
     """
 
-    ds = _resolve_dataset_type(ds)
+    ds = utils._resolve_dataset_type(ds)
     time_comp = ds['filename'][time_index_in_name]
 
     for time_element in time_comp.split('-'):
@@ -154,7 +151,7 @@ def check_valid_temporal_element(ds, time_index_in_name=-1):
 
 def calculate_detlat_time_series(times, valid_dt):
     """
-       _calculate_detla_time_series
+       calculate_detla_time_series
 
     This function calculates the differences between all the elements of a timeseries and
     compares the differences with a valid time difference.
@@ -193,15 +190,15 @@ def check_regular_time_axis_increments(ds, frequency_index=1):
     :return: boolean [True for success]
     """
 
-    ds = _resolve_dataset_type(ds)
+    ds = utils._resolve_dataset_type(ds)
     frequency = ds['filename'][frequency_index]
     calendar = ds["time"]["calendar"]
     times = ds["time"]["_data"]
 
     delta_t = [times[1] - times[0]]
 
-    if frequency == 'mon' and calendar in IRREGULAR_MONTHLY_CALENDARS:
-        true_or_false = calculate_detlat_time_series(times, VALID_MONTHLY_TIME_DIFFERENCES)
+    if frequency == 'mon' and calendar in constants.IRREGULAR_MONTHLY_CALENDARS:
+        true_or_false = calculate_detlat_time_series(times, constants.VALID_MONTHLY_TIME_DIFFERENCES)
 
     else:
         true_or_false = calculate_detlat_time_series(times, delta_t)

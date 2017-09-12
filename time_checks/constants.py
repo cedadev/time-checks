@@ -1,4 +1,6 @@
 
+import re
+
 # File name regular expressions for different time component patterns
 DT_LENGTHS = ['4', '6', '8', '10', '12', '14']
 

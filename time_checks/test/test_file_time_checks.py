@@ -8,7 +8,7 @@ Tests for the checks in the `file_time_checks.py` module.
 from netCDF4 import Dataset
 
 from time_checks.file_time_checks import *
-from time_checks.multiFile_time_checks import *
+from time_checks.multifile_time_checks import *
 from time_checks.test.mock_netcdf import MockNCDataset
 from time_checks import utils, time_utils, settings, constants
 
@@ -157,10 +157,10 @@ def test_check_multifile_temporal_continutity_success_1():
                          ]
 
     six_hourly_names = [
-        'tas_6hr_HadGEM2-ES_historical_r1i1p1_190001010000-190001010600.nc',
-        'tas_6hr_HadGEM2-ES_historical_r1i1p1_190001011200-190001012359.nc',
-        'tas_6hr_HadGEM2-ES_historical_r1i1p1_190001020559-190001030000.nc',
-        'tas_6hr_HadGEM2-ES_historical_r1i1p1_190001030600-190001050000.nc',
+        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001010000-190001010600.nc',
+        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001011200-190001012359.nc',
+        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001020559-190001030000.nc',
+        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001030600-190001050000.nc',
     ]
 
 
@@ -217,9 +217,9 @@ def test_check_multifile_temporal_continutity_fail_1():
                          ]
 
     six_hourly_names = [
-        'tas_6hr_HadGEM2-ES_historical_r1i1p1_190001010000-190001010600.nc',
-        'tas_6hr_HadGEM2-ES_historical_r1i1p1_190001011300-190001012359.nc',
-        'tas_6hr_HadGEM2-ES_historical_r1i1p1_190001020559-190001022359.nc',
+        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001010000-190001010600.nc',
+        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001011300-190001012359.nc',
+        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001020559-190001022359.nc',
     ]
 
     for fnames in [yearly_names, monthly_names, daily_names, three_hourly_names, six_hourly_names]:
@@ -274,9 +274,9 @@ def test_check_multifile_temporal_continutity_fail_2():
                          ]
 
     six_hourly_names = [
-        'tas_6hr_HadGEM2-ES_historical_r1i1p1_190001010000-190001010600.nc',
-        'tas_6hr_HadGEM2-ES_historical_r1i1p1_190001010600-190001012359.nc',
-        'tas_6hr_HadGEM2-ES_historical_r1i1p1_190001020559-190001022359.nc',
+        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001010000-190001010600.nc',
+        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001010600-190001012359.nc',
+        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001020559-190001022359.nc',
     ]
 
     for fnames in [yearly_names, monthly_names, daily_names, three_hourly_names, six_hourly_names]:
