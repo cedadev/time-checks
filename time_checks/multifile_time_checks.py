@@ -33,8 +33,8 @@ def check_multifile_temporal_continutity(dss, time_index_in_name=-1, frequency_i
         (2) there are no missing timesteps in the timesesries
         (3) that the set is complete, i.e. it is continuous from file 0:n by fullfilling (1) and (2)
 
-    To ensure that the timeseries metadata meet all requirements use this routine in conjunction with
-    the other tests defined here.
+    This routine only checks the filename it assumes that each file has passed the QC test:
+        check_file_name_matches_time_var
 
     :param dss: list of netCDF4 Dataset objects or compliant dictionary objects
     :param time_index_in_name: index of the time index in the filename
@@ -43,10 +43,6 @@ def check_multifile_temporal_continutity(dss, time_index_in_name=-1, frequency_i
 
     :return: boolean [True for success]
     """
-
-    # The files must be provided in correct order
-    #
-    # TODO: (1) RE-ORDER - use arrow?
 
     file_times = []
     for ds in dss:
