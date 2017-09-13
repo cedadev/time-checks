@@ -60,7 +60,7 @@ def check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:
     time_comp = ds['filename'][time_index_in_name]
     calendar = ds["time"]["calendar"]
 
-    file_times = [ utils._parse_time(comp) for comp in time_comp.split("-")]
+    file_times = [utils._parse_time(comp) for comp in time_comp.split("-")]
     times = num2date([time_var[0], time_var[-1]], ds["time"]["units"], calendar=calendar)
     t_start, t_end = [arrow.get(tm.strftime()) for tm in times]
 

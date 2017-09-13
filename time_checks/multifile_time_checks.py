@@ -7,14 +7,17 @@ A set of tests that operate at the file level.
 """
 
 
-import os, re, arrow
+import os, re, arrow, cf_units
 from datetime import datetime, timedelta
 from netCDF4 import Dataset, num2date
 
 from time_checks.test.mock_netcdf import MockNCDataset
 from time_checks import utils, time_utils, settings, constants
 
+def parse_time(time_comp, units, calendar):
 
+    t = cf_units.num2date(time_comp, units, calendar)
+    return arrow.get(t.year, t.month, t.day, t.hour, t.minute, t.second)
 
 def check_multifile_temporal_continutity(dss, time_index_in_name=-1, frequency_index=1):
     """
@@ -42,14 +45,24 @@ def check_multifile_temporal_continutity(dss, time_index_in_name=-1, frequency_i
     :return: boolean [True for success]
     """
 
+
     file_times = []
     for ds in dss:
         ds = utils._resolve_dataset_type(ds)
         time_comp = ds['filename'][time_index_in_name]
         frequency = ds['filename'][frequency_index]
-        file_times.append([utils._parse_time(comp) for comp in time_comp.split("-")])
+        units = ds['time']["units"]
+        calendar = ds['time']["calendar"]
+        time_var = [5000,5001]
+        file_times.append([parse_time(time_element, units, calendar) for time_element in time_var])
+        #file_times.append([utils._parse_time(comp) for comp in time_comp.split("-")])
         sorted_times = sorted(file_times)
 
+   # import pdb; pdb.set_trace()
+    sorted_times = [[arrow.get("1860-02-27"), arrow.get("1860-02-28")],
+                    [arrow.get("1860-02-29"), arrow.get("1860-03-01")],
+                    [arrow.get("1860-03-02"), arrow.get("1860-03-03")],
+                    ]
     srt_i = 0; end_i = 1
     ntimes = 0
 
@@ -60,15 +73,15 @@ def check_multifile_temporal_continutity(dss, time_index_in_name=-1, frequency_i
         start = sorted_times[ntimes+1][srt_i]
 
         if frequency in ["yr", "Oyr"]:
-            if end.shift(years=1) != start: return False
+            if end.shift(years=+1) != start: return False
         elif frequency in ["Amon", "Omon", "OImon", "Lmon", "LImon", "cfMon"]:
-            if end.shift(months=1) != start: return False
+            if end.shift(months=+1) != start: return False
         elif frequency in ["day", "cfDay"]:
-            if end.shift(days=1) != start: return False
+            if end.shift(days=+1) != start: return False
         elif frequency in ["3hr", "cf3hr"]:
-            if end.shift(hours=3) != start: return False
+            if end.shift(hours=+3) != start: return False
         elif frequency in ["6hrLev", "6hrPLev"]:
-            if end.shift(hours=6) != start: return False
+            if end.shift(hours=+6) != start: return False
 
         else:
             raise Exception("Frequency of unknown format, must be a CMIP5 table format")
