@@ -1,18 +1,17 @@
 """
 multiFile_time_checks.py
-==================
+========================
 
-A set of tests that operate at the file level.
+A set of tests that operate at the multiple file level.
 
 """
 
 
-import os, re, arrow, cf_units
-from datetime import datetime, timedelta
-from netCDF4 import Dataset, num2date
+import arrow
+import cf_units
 
-from time_checks.test.mock_netcdf import MockNCDataset
-from time_checks import utils, time_utils, settings, constants
+from time_checks import utils
+
 
 def parse_time(time_comp, units, calendar):
 

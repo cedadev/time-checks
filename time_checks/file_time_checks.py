@@ -6,12 +6,11 @@ A set of tests that operate at the file level.
 
 """
 
-import os, re, arrow
-from datetime import datetime, timedelta
+import arrow
 from netCDF4 import Dataset, num2date
 
-from time_checks.test.mock_netcdf import MockNCDataset
-from time_checks import utils, time_utils, settings, constants
+from time_checks import utils, constants
+
 
 def check_file_name_time_format(ds, time_index_in_name=-1):
     """

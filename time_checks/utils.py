@@ -1,10 +1,12 @@
 
-import os, re, arrow
-from datetime import datetime, timedelta
+import os
+from datetime import timedelta
+
+import arrow
 from netCDF4 import Dataset, num2date
 
-from time_checks.test.mock_netcdf import MockNCDataset
-from time_checks import time_utils, settings, constants
+from time_checks import time_utils
+
 
 def _resolve_dataset_type(ds):
     """
@@ -94,6 +96,7 @@ def _convert_dataset_to_dict(ds):
         dtype, bounds, long_name, standard_name, units, calendar, axis
     """
     time_var = time_utils.get_time_variable(ds)
+
     time_dict = {
         "_type": time_var.dtype.name,
         "bounds": _get_nc_attr(time_var, "bounds"),
