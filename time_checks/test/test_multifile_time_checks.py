@@ -1,18 +1,27 @@
 """
-test_file_time_checks.py
-========================
+test_multifile_time_checks.py
+=============================
 
-Tests for the checks in the `file_time_checks.py` module.
+Tests for the checks in the `multifile_time_checks.py` module.
 """
-
-from netCDF4 import Dataset
 
 from time_checks.multifile_time_checks import *
 from time_checks.test.mock_netcdf import MockNCDataset
-from time_checks import utils, time_utils, settings, constants
+from time_checks import settings
 
 # INCLUDE MockNCDataset in supported settings
 settings.supported_datasets.append(MockNCDataset)
+
+
+def test_parse_time_calendars_success():
+    x = parse_time(29, "days since 2000-02-01 00:00:00", calendar="360_day")
+    assert(x.timetuple()[:6] == (2000, 2, 30, 0, 0, 0))
+
+    x = parse_time(29, "days since 1999-02-01 00:00:00", calendar="standard")
+    assert(x.timetuple()[:6] == (1999, 3, 2, 0, 0, 0))
+
+    x = parse_time(28, "days since 1999-02-01 00:00:00", calendar="366_day")
+    assert(x.timetuple()[:6] == (1999, 2, 29, 0, 0, 0))
 
 
 def test_check_multifile_temporal_continutity_success_1():
@@ -76,7 +85,7 @@ def test_check_multifile_temporal_continutity_success_1():
         for fname in fnames:
             mock_dss.append(MockNCDataset(fname))
 
-        assert(check_multifile_temporal_continutity(mock_dss, time_index_in_name=-1) == True)
+        assert(check_multifile_temporal_continuity(mock_dss, time_index_in_name=-1) == True)
 
 def test_check_multifile_temporal_continutity_fail_1():
 
@@ -134,7 +143,7 @@ def test_check_multifile_temporal_continutity_fail_1():
         for fname in fnames:
             mock_dss.append(MockNCDataset(fname))
 
-        assert(check_multifile_temporal_continutity(mock_dss, time_index_in_name=-1) == False)
+        assert(check_multifile_temporal_continuity(mock_dss, time_index_in_name=-1) == False)
 
 def test_check_multifile_temporal_continutity_fail_2():
     """
@@ -162,10 +171,7 @@ def test_check_multifile_temporal_continutity_fail_2():
     ####
     daily_names = [
                    'tas_day_HadGEM2-ES_historical_r1i1p1_18840101-19091212.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19091212-19341130.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19341201-19591231.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19600101-19841130.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19841201-20051130.nc',
+                   'tas_day_HadGEM2-ES_historical_r1i1p1_19091212-19341130.nc'
                    ]
 
     ####
@@ -191,4 +197,4 @@ def test_check_multifile_temporal_continutity_fail_2():
         for fname in fnames:
             mock_dss.append(MockNCDataset(fname))
 
-        assert(check_multifile_temporal_continutity(mock_dss, time_index_in_name=-1) == False)
+        assert(check_multifile_temporal_continuity(mock_dss, time_index_in_name=-1) == False)

@@ -56,6 +56,14 @@ rcp26	RCP2.6	2006-2300	295
 rcp60	RCP6.0	2006-2100	94
 ```
 
+## Support for calendars
+
+The library currently supports two calendars:
+ - standard
+ - 360-day
+
+Support can be added for other calendars as required.
+
 ## Installation
 
 The package is managed in a GitHub repository here:

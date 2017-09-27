@@ -1,5 +1,6 @@
 
 import os
+import re
 from datetime import timedelta
 
 import arrow
@@ -116,7 +117,7 @@ def _convert_dataset_to_dict(ds):
     return dict
 
 
-def _parse_time_new(time_element, units="day since 1850-01-01", calendar="standard"):
+def OLD_parse_time_new(time_element, units="day since 1850-01-01", calendar="standard"):
     """
         _parse_time
 
@@ -180,6 +181,20 @@ def _parse_time(tm):
     return arrow.get(formatted_time)
 
 
+def get_nc_datetime(time_comp, units, calendar):
+    """
+    Returns a time object from netcdftime library. Type can be a number of date time
+    objects reflecting the calendar specified.
+
+    :param time_comp: time value [integer]
+    :param units: time units [string]
+    :param calendar: calendar [string]
+    :return: a netcdftime object.
+    """
+    t = cf_units.num2date(time_comp, units, calendar)
+    return t
+
+
 def _times_match_within_tolerance(t1, t2, tolerance="days:1"):
     """
         _times_match_within_tolerance
@@ -202,4 +217,105 @@ def _times_match_within_tolerance(t1, t2, tolerance="days:1"):
         return True
 
     return False
+
+
+
+class DateTimeAnyTime(object):
+    """
+    Class to mimmick the interface of a ``datetime.datetime`` object. It has the
+    same time component attributes so can be treated like a datetime object by
+    other code.
+
+    This allows _illegal_ time values to be set such as the 30th February - as used
+    by the 360_day calendar. The requirement to use dates that are out of range means
+    we cannot use ``datetime`` or ``arrow`` objects.
+    """
+
+    def __init__(self, year, month=1, day=1, hour=0, minute=0, second=0, microsecond=0):
+        """
+
+        :param year: year [integer]
+        :param month: month [integer], default: 1
+        :param day: day [integer], default: 1
+        :param hour: hour [integer], default: 0
+        :param minute: minute [integer], default: 0
+        :param second: second [integer], default: 0
+        :param microsecond: microsecond [integer], default: 0
+        """
+        self.year = year
+        self.month = month
+        self.day = day
+        self.hour = hour
+        self.minute = minute
+        self.second = second
+        self.microsecond = microsecond
+
+        self._components = (self.year, self.month, self.day, self.hour,
+                           self.minute, self.second, self.microsecond)
+
+    def __str__(self):
+        return "{}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}.{}".format(*self._components)
+
+    def __repr__(self):
+        return str(self)
+
+
+def str_to_anytime(dt):
+    """
+    Takes a string representing date/time and returns a DateTimeAnyTime object.
+    String formats should start with Year and go through to Microsecond, but you
+    can miss out anything from month onwards.
+
+    :param dt: string representing a date/time [string]
+    :return: DateTimeAnyTime object
+    """
+    defaults = [-1, 1, 1, 0, 0, 0, 0]
+    lens = [4, 2, 2, 2, 2, 2, -1]
+    cleaned_dt = re.sub("[- T:.]", "", dt)
+    components = []
+
+    for length in lens:
+        if len(cleaned_dt) == 0:
+            break
+        components.append(int(cleaned_dt[:length]))
+        cleaned_dt = cleaned_dt[length:]
+
+    return DateTimeAnyTime(*components)
+
+
+
+class TimeSeries(object):
+    """
+    TimeSeries class - able to generate a time series from a start, end, interval
+    and calendar.
+    """
+    # Define constants for calculating intervals
+    _second = (0, 1)
+    _minute = (0, 60)
+    _hour = (0, 3600)
+    _day = (1, 0)
+
+    SUPPORTED_FREQUENCIES = ['day', 'month']
+
+    def __init__(self, start, end, delta, calendar="standard"):
+        self._set_delta(delta)
+        self.base_time_unit = 'days since {}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}.{}'.format()
+        self.start = get_nc_datetime(start, "")
+
+    def _set_delta(self, delta):
+        """
+
+        :param delta:
+        :return:
+        """
+        if type(delta) not in (tuple, list) or len(delta) != 2:
+            raise Exception('Delta must be tuple of (<number>, <time_unit>) such as: (3, "hour")')
+
+        if not delta[1] in self.SUPPORTED_FREQUENCIES:
+            raise Exception("Delta uses time frequency '{}' that is not yet supported.".format(delta[1]))
+
+        if delta[1] in self.FREQUENCY_MAPPINGS:
+            delta = (delta[0], self.FREQUENCY_MAPPINGS[delta[1]])
+
+        self.delta = delta
 

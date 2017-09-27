@@ -13,3 +13,9 @@ class MockNCDataset(object):
 
     def filepath(self):
         return self.fpath
+
+    def __repr__(self):
+        return str(self)
+
+    def __str__(self):
+        return self.fpath

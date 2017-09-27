@@ -6,34 +6,30 @@ A set of tests that operate at the multiple file level.
 
 """
 
-
+import re
+from datetime import timedelta
+from itertools import chain
 import arrow
 import cf_units
 
 from time_checks import utils
 
 
-def parse_time(time_comp, units, calendar):
-
-    t = cf_units.num2date(time_comp, units, calendar)
-    return arrow.get(t.year, t.month, t.day, t.hour, t.minute, t.second)
-
-def check_multifile_temporal_continutity(dss, time_index_in_name=-1, frequency_index=1):
+def check_multifile_temporal_continuity(dss, time_index_in_name=-1, frequency_index=1):
     """
-       check_multifile_temporal_continutity:
+       check_multifile_temporal_continuity:
 
-    This function checks for the temporal continutiy over a given number of datafiles.
+    This function checks for the temporal continuity over a given number of datafiles.
 
-    The test is checks that for each file in a timeseries
-    that the start time of given in the filename is one timestep ahead of the end time
-    of the previous file in the timeseries.
+    The test checks that for each file in a time series the start time of given in the
+    filename is one time step ahead of the end time of the previous file in the time series.
 
-    This test checks that from the start for a given timeseries that
-        (1) there are no jumps in the timeseries
-        (2) there are no missing timesteps in the timesesries
-        (3) that the set is complete, i.e. it is continuous from file 0:n by fullfilling (1) and (2)
+    This test checks that from the start for a given time series that:
+        (1) there are no jumps in the time series
+        (2) there are no missing time steps in the time series
+        (3) that the set is complete, i.e. it is continuous from file 0:n by fulfilling (1) and (2)
 
-    This routine only checks the filename it assumes that each file has passed the QC test:
+    This routine only checks the filename as it assumes that each file has passed the check:
         check_file_name_matches_time_var
 
     :param dss: list of netCDF4 Dataset objects or compliant dictionary objects
@@ -43,25 +39,50 @@ def check_multifile_temporal_continutity(dss, time_index_in_name=-1, frequency_i
 
     :return: boolean [True for success]
     """
-
-
+    # Sort the file list just in case files have been provided in a strange order
+    dss.sort()
     file_times = []
+
+    # Get time components from all files and check they are monotonic
+    time_comps = [ds['filename'][time_index_in_name] for ds in dss]
+    times = chain(*[tc.split("-") for tc in time_comps])
+
+
+
+    """
+import timeseries generator
+    start = [2000, 1, 1]
+    end = [2009, 12, 30]
+    tsg = TimeSeriesGenerator(start, end, delta=[1, 'day'], calendar='360_day')
+
+    length = 10 * 12 * 30
+    data = [dt for dt in tsg]
+    assert(len(data) == length)
+
+    assert(data[31][1] == [2000, 2, 2])
+    assert(data[-1][1] == [2009, 12, 30])
+
+
+"""
+    if frequency not in ("day",): raise Exception("Frequency {} not supported.".format(frequency))
     for ds in dss:
         ds = utils._resolve_dataset_type(ds)
         time_comp = ds['filename'][time_index_in_name]
         frequency = ds['filename'][frequency_index]
+
         units = ds['time']["units"]
         calendar = ds['time']["calendar"]
-        time_var = [5000,5001]
+        time_var = [5000, 5001]
+
         file_times.append([parse_time(time_element, units, calendar) for time_element in time_var])
         #file_times.append([utils._parse_time(comp) for comp in time_comp.split("-")])
         sorted_times = sorted(file_times)
 
    # import pdb; pdb.set_trace()
-    sorted_times = [[arrow.get("1860-02-27"), arrow.get("1860-02-28")],
-                    [arrow.get("1860-02-29"), arrow.get("1860-03-01")],
-                    [arrow.get("1860-03-02"), arrow.get("1860-03-03")],
-                    ]
+    #sorted_times = [[arrow.get("1860-02-27"), arrow.get("1860-02-28")],
+    #                [arrow.get("1860-02-29"), arrow.get("1860-03-01")],
+    #                [arrow.get("1860-03-02"), arrow.get("1860-03-03")],
+    #                ]
     srt_i = 0; end_i = 1
     ntimes = 0
 

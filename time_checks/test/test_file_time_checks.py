@@ -83,8 +83,10 @@ def test_check_time_format_matches_frequency_test_all_combinations():
 
     positives = [('Oyr', '1999-2005'),
                  ('Amon', '199912-200511'),
+                 ('monClim', '199912-200511'),
                  ('day', '19991201-20051130'),
                  ('3hr', '199912010101-200511300101'),
+                 ('subhr', '199912010101-200511300101'),
                  ('6hrLev', '1999120101-2005113001')]
     frequencies = ('Oyr', 'Amon', 'day', '3hr', '6hrLev')
     time_ranges = ('1999-2005', '199912-200511', '19991201-20051130',
@@ -102,11 +104,11 @@ def test_check_time_format_matches_frequency_test_all_combinations():
 def test_check_regular_time_axis_increments_success_1():
     ds = Dataset('/data/time-checks/mrsos_day_HadGEM2-ES_historical_r1i1p1_19991201-20051130.nc')
     assert(check_regular_time_axis_increments(ds, frequency_index=1) == True)
-
+### NEEDS COVERAGE FOR DIFFERENT CALENDARS
 
 def test_check_regular_time_axis_increments_fail_1():
     pass
-
+### NEEDS COVERAGE FOR DIFFERENT CALENDARS
 
 def test_check_valid_temporal_element_success_1():
     eg_names = ['mrsos_Oyr_HadGEM2-ES_historical_r1i1p1_1999-2005.nc',
@@ -119,8 +121,6 @@ def test_check_valid_temporal_element_success_1():
     for fname in eg_names:
         mock_ds = MockNCDataset(fname)
         assert(check_valid_temporal_element(mock_ds, time_index_in_name=-1) == True)
-
-
 
 def test_check_valid_temporal_element_fail_1():
     eg_names = ['mrsos_Oyr_HadGEM2-ES_historical_r1i1p1_1999-4005.nc',
