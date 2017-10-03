@@ -4,6 +4,7 @@ import re
 from datetime import timedelta
 
 import arrow
+import cf_units
 from netCDF4 import Dataset, num2date
 
 from time_checks import time_utils
@@ -154,8 +155,6 @@ def OLD_parse_time_new(time_element, units="day since 1850-01-01", calendar="sta
 
 def _parse_time(tm):
     """
-        _parse_time
-
     Parses time component string to an arrow date time object.
 
     :param tm: date-time [string]
@@ -269,19 +268,31 @@ def str_to_anytime(dt):
     :param dt: string representing a date/time [string]
     :return: DateTimeAnyTime object
     """
+    if len(dt) < 1:
+        raise Exception("Must provide at least the year as argument to create date time.")
+
+    # Start with most common pattern
+    regex = re.compile("^(\d+)-(\d+)-(\d+)[T ](\d+):(\d+):(\d+).(\d+)$")
+    match = regex.match(dt)
+    if match:
+        return DateTimeAnyTime(*[int(i) for i in match.groups()])
+
     defaults = [-1, 1, 1, 0, 0, 0, 0]
-    lens = [4, 2, 2, 2, 2, 2, -1]
+    lens = [4, 2, 2, 2, 2, 2, None]
     cleaned_dt = re.sub("[- T:.]", "", dt)
     components = []
 
     for length in lens:
         if len(cleaned_dt) == 0:
             break
-        components.append(int(cleaned_dt[:length]))
+
+        value = int(cleaned_dt[:length])
+
+        components.append(value)
         cleaned_dt = cleaned_dt[length:]
 
+    components += defaults[len(components):]
     return DateTimeAnyTime(*components)
-
 
 
 class TimeSeries(object):
@@ -290,19 +301,40 @@ class TimeSeries(object):
     and calendar.
     """
     # Define constants for calculating intervals
+    _microsecond = (0, 0, 1)
     _second = (0, 1)
     _minute = (0, 60)
     _hour = (0, 3600)
     _day = (1, 0)
 
-    SUPPORTED_FREQUENCIES = ['day', 'month']
+    # Conversion factors
+    CONVERSION_FACTORS = {('microsecond', 'second'): 1000.,
+                          ('second', 'day'): 60 * 60 * 24.,
+                          ('minute', 'day'): 60 * 24.,
+                          ('hour', 'day'): 24.}
+
+    SUPPORTED_FREQUENCIES = ['hour', 'day', 'month']
+    FREQUENCY_MAPPINGS = {'mon': 'month'}
 
     def __init__(self, start, end, delta, calendar="standard"):
-        self._set_delta(delta)
-        self.base_time_unit = 'days since {}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}.{}'.format()
-        self.start = get_nc_datetime(start, "")
 
-    def _set_delta(self, delta):
+
+        self._clean_delta(delta)
+        self.calendar = calendar
+        self.base_time_unit = 'days since {}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}.{}'.format(*start._components)
+        self.series = []
+
+        # In the case of year and monthly deltas we need to convert the `_components` of DateTimeAnyTime objects
+        if self.delta.unit == "year":
+            self._generate_time_series_year_delta(start, end)
+        elif self.delta.unit == "month":
+            self._generate_time_series_month_delta(start, end)
+        # In all other cases we use NetCDF datetime objects and their operations
+        else:
+            self._generate_time_series(start, end)
+
+
+    def _clean_delta(self, delta):
         """
 
         :param delta:
@@ -317,5 +349,56 @@ class TimeSeries(object):
         if delta[1] in self.FREQUENCY_MAPPINGS:
             delta = (delta[0], self.FREQUENCY_MAPPINGS[delta[1]])
 
-        self.delta = delta
+        # Define simple class for holding the delta
+        class Delta(object):
+            def __init__(self, n, unit):
+                self.n = n
+                self.unit = unit
+
+        self.delta = Delta(*delta)
+
+
+    def _resolve_delta(self):
+        """
+        Reads `self.delta` set as (<n>, <time_interval>) and returns as tuple of:
+            (<n_days>, <n_seconds>, <n_microseconds>)
+
+        :return: Tuple of (<n_days>, <n_seconds>, <n_microseconds>)
+        """
+        if self.delta.unit == 'day':
+            return (self.delta.n, 0, 0)
+        elif self.delta.unit == 'hour':
+            return (self.delta.n / self.CONVERSION_FACTORS[('hour', 'day')], 0, 0)
+
+
+    def _generate_time_series(self, start, end):
+        """
+        Generator time series and stores in `self.series`
+
+        :return: None
+        """
+        start_value = cf_units.date2num(start, self.base_time_unit, self.calendar)
+        end_value = cf_units.date2num(end, self.base_time_unit, self.calendar)
+
+        start = get_nc_datetime(start_value, self.base_time_unit, self.calendar)
+        end = get_nc_datetime(end_value, self.base_time_unit, self.calendar)
+
+        delta = self._resolve_delta()
+        current_time = start
+
+        while current_time <= end:
+            self.series.append(current_time)
+
+            # Now increment
+            current_time += timedelta(*delta)
+            print delta, timedelta
+            print current_time, end
+
+
+    def _generate_time_series_year_delta(self, start, end):
+        pass
+
+
+    def _generate_time_series_month_delta(self, start, end):
+        pass
 

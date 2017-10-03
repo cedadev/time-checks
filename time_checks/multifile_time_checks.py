@@ -17,9 +17,7 @@ from time_checks import utils
 
 def check_multifile_temporal_continuity(dss, time_index_in_name=-1, frequency_index=1):
     """
-       check_multifile_temporal_continuity:
-
-    This function checks for the temporal continuity over a given number of datafiles.
+    Checks for the temporal continuity over a given number of data files.
 
     The test checks that for each file in a time series the start time of given in the
     filename is one time step ahead of the end time of the previous file in the time series.
