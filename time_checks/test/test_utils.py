@@ -5,8 +5,11 @@ test_utils.py
 Tests for the `utils.py` module.
 """
 
+from datetime import datetime
+
 from time_checks import utils
 from datetime import timedelta
+
 
 def test_get_nc_datetime_calendars_success():
     x = utils.get_nc_datetime(29, "days since 2000-02-01 00:00:00", calendar="360_day")
@@ -54,6 +57,29 @@ def test_add_to_netcdf_datetime_success():
         assert(str(res) == "1999-02-30 12:00:00")
 
 
+def test_add_to_netcdf_datetime_for_all_calendars_success():
+    # TODO: Ruth to create simple test for each calendar type here
+    # E.g.
+    x = utils.get_nc_datetime(27, "days since 1999-02-01 00:00:00", calendar="360_day")
+    res = x + timedelta(2.5)
+    assert(str(res) == "1999-02-30 12:00:00")
+    # And one for calendar
+    #...
+
+
+def test_time_series_type_checks():
+    # Check datetime instance is rejected with TypeError
+    start = end = datetime(1999, 1, 1)
+    try:
+        utils.TimeSeries(start, end, (1, "day"), calendar="360_day")
+    except TypeError, err:
+        pass
+
+    # Check DateTimeAnyTime is accepted
+    start = end = utils.DateTimeAnyTime(1999, 1, 1)
+    utils.TimeSeries(start, end, (1, "day"), calendar="360_day")
+
+
 def test_time_series_daily_360_day_success():
     start = utils.str_to_anytime("1999-01-01T00:00:00")
     end = utils.str_to_anytime("1999-02-30T00:00:00")
@@ -82,3 +108,43 @@ def test_time_series_6_hourly_standard_success():
     assert(len(s) == 244)
     assert(str(s[0]) == "1999-01-01 00:00:00")
     assert(str(s[-1]) == "1999-03-02 18:00:00")
+
+
+def test_time_series_monthly_standard_success():
+    start = utils.str_to_anytime("2001-01-15T00:00:00")
+    end = utils.str_to_anytime("2010-12-15T00:00:00")
+    ts = utils.TimeSeries(start, end, (1, "mon"), calendar="standard")
+    s = ts.series
+    assert(len(s) == 120)
+    assert(str(s[0]) == "2001-01-15 00:00:00")
+    assert(str(s[-1]) == "2010-12-15 00:00:00")
+
+
+def test_time_series_monthly_360_day_success():
+    start = utils.str_to_anytime("2001-01-15T00:00:00")
+    end = utils.str_to_anytime("2011-01-15T00:00:00")
+    ts = utils.TimeSeries(start, end, (6, "month"), calendar="360_day")
+    s = ts.series
+    assert(len(s) == 21)
+    assert(str(s[0]) == "2001-01-15 00:00:00")
+    assert(str(s[-1]) == "2011-01-15 00:00:00")
+
+
+def test_time_series_yearly_standard_success():
+    start = utils.str_to_anytime("2001-01-01T00:00:00")
+    end = utils.str_to_anytime("2099-12-30T23:59:59")
+    ts = utils.TimeSeries(start, end, (1, "yr"), calendar="standard")
+    s = ts.series
+    assert(len(s) == 99)
+    assert(str(s[0]) == "2001-01-01 00:00:00")
+    assert(str(s[-1]) == "2099-01-01 00:00:00")
+
+
+def test_time_series_yearly_360_day_success():
+    start = utils.str_to_anytime("2001-01-15T00:00:00")
+    end = utils.str_to_anytime("2011-01-15T00:00:00")
+    ts = utils.TimeSeries(start, end, (2, "year"), calendar="360_day")
+    s = ts.series
+    assert(len(s) == 6)
+    assert(str(s[0]) == "2001-01-15 00:00:00")
+    assert(str(s[-1]) == "2011-01-15 00:00:00")

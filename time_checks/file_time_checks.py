@@ -148,9 +148,9 @@ def check_valid_temporal_element(ds, time_index_in_name=-1):
 
     return True
 
-def calculate_detlat_time_series(times, valid_dt):
+def calculate_delta_time_series(times, valid_dt):
     """
-       calculate_detla_time_series
+       calculate_delta_time_series
 
     This function calculates the differences between all the elements of a timeseries and
     compares the differences with a valid time difference.
@@ -197,9 +197,9 @@ def check_regular_time_axis_increments(ds, frequency_index=1):
     delta_t = [times[1] - times[0]]
 
     if frequency == 'mon' and calendar in constants.IRREGULAR_MONTHLY_CALENDARS:
-        true_or_false = calculate_detlat_time_series(times, constants.VALID_MONTHLY_TIME_DIFFERENCES)
+        true_or_false = calculate_delta_time_series(times, constants.VALID_MONTHLY_TIME_DIFFERENCES)
 
     else:
-        true_or_false = calculate_detlat_time_series(times, delta_t)
+        true_or_false = calculate_delta_time_series(times, delta_t)
 
     return true_or_false

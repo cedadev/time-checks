@@ -15,7 +15,7 @@ import cf_units
 from time_checks import utils
 
 
-def check_multifile_temporal_continuity(dss, time_index_in_name=-1, frequency_index=1):
+def OLD_check_multifile_temporal_continuity(dss, time_index_in_name=-1, frequency_index=1):
     """
     Checks for the temporal continuity over a given number of data files.
 
@@ -46,22 +46,6 @@ def check_multifile_temporal_continuity(dss, time_index_in_name=-1, frequency_in
     times = chain(*[tc.split("-") for tc in time_comps])
 
 
-
-    """
-import timeseries generator
-    start = [2000, 1, 1]
-    end = [2009, 12, 30]
-    tsg = TimeSeriesGenerator(start, end, delta=[1, 'day'], calendar='360_day')
-
-    length = 10 * 12 * 30
-    data = [dt for dt in tsg]
-    assert(len(data) == length)
-
-    assert(data[31][1] == [2000, 2, 2])
-    assert(data[-1][1] == [2009, 12, 30])
-
-
-"""
     if frequency not in ("day",): raise Exception("Frequency {} not supported.".format(frequency))
     for ds in dss:
         ds = utils._resolve_dataset_type(ds)
@@ -107,3 +91,30 @@ import timeseries generator
         ntimes += 1
 
     return True
+
+
+
+def check_multifile_temporal_continuity(dss, time_index_in_name=-1, frequency_index=1):
+    """
+    """
+    dss = [utils._resolve_dataset_type(ds) for ds in dss]
+
+    # Sort the datasets by file name just in case files have been provided in a strange order
+    dss_by_name = [(ds['filename'], ds) for ds in dss]
+    dss_by_name.sort()
+
+    # Get first and last dates and time frequency to generate full time series
+    # for all files
+    (start, _), frequency = utils._get_details_from_file_name(dss_by_name[0])
+    (_1, end), _2 = utils._get_details_from_file_name(dss_by_name[-1])
+
+    # Convert start and end to datetimes
+    start, end = [utils.str_to_anytime(tm) for tm in (start, end)]
+    calendar = dss_by_name[0]['calendar']
+
+    # Full series for all files
+    series = utils.TimeSeries(start, end, (1, frequency), calendar).series
+
+
+    return True
+

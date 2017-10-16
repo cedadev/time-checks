@@ -5,12 +5,34 @@ test_multifile_time_checks.py
 Tests for the checks in the `multifile_time_checks.py` module.
 """
 
+import os
+
+from netCDF4 import Dataset
+
 from time_checks.multifile_time_checks import *
 from time_checks.test.mock_netcdf import MockNCDataset
+
 from time_checks import settings
 
 # INCLUDE MockNCDataset in supported settings
 settings.supported_datasets.append(MockNCDataset)
+
+CMIP5_DATA_DIR = "test_data/cmip5"
+
+
+def test_multifile_1():
+    monthly_names = ['tas_Amon_HadGEM2-ES_historical_r1i1p1_185912-188411.nc',
+                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_188412-190911.nc',
+                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_190912-193411.nc',
+                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_193412-195911.nc',
+                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_195912-198411.nc',
+                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_198412-200511.nc']
+
+    monthly_paths = [os.path.join(CMIP5_DATA_DIR, fname) for fname in monthly_names]
+    datasets = [Dataset(fpath) for fpath in monthly_paths]
+
+    result = check_multifile_temporal_continuity(datasets, time_index_in_name=-1)
+    assert(result == True)
 
 
 def test_check_multifile_temporal_continutity_success_1():

@@ -10,6 +10,23 @@ from netCDF4 import Dataset, num2date
 from time_checks import time_utils
 
 
+def get_details_from_file_name(fname, time_index_in_name=-1, frequency_index=1):
+    """
+    Returns a tuple of ((start, end), frequency) parsed from file name.
+
+    :param fname: File name or path
+    :param time_index_in_name: index of time component in file name
+    :param frequency_index: index of frequency component in file name
+    :return: Tuple of: ((start, end), frequency)
+    """
+    fname = os.path.splitext(os.path.basename(fname))[0]
+
+    start, end = fname.split("_")[time_index_in_name].split("-")
+    frequency = fname.split("_")[frequency_index]
+
+    return (start, end), frequency
+
+
 def _resolve_dataset_type(ds):
     """
     _resolve_dataset_type
@@ -218,7 +235,6 @@ def _times_match_within_tolerance(t1, t2, tolerance="days:1"):
     return False
 
 
-
 class DateTimeAnyTime(object):
     """
     Class to mimmick the interface of a ``datetime.datetime`` object. It has the
@@ -249,14 +265,31 @@ class DateTimeAnyTime(object):
         self.second = second
         self.microsecond = microsecond
 
-        self._components = (self.year, self.month, self.day, self.hour,
-                           self.minute, self.second, self.microsecond)
+    @property
+    def _components(self):
+        return self.year, self.month, self.day, self.hour, self.minute, self.second, self.microsecond
 
     def __str__(self):
         return "{}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}.{}".format(*self._components)
 
     def __repr__(self):
         return str(self)
+
+    def __gt__(self, other):
+        this, other = self._components, other._components
+        return this > other
+
+    def __lt__(self, other):
+        this, other = self._components, other._components
+        return this < other
+
+    def __ge__(self, other):
+        this, other = self._components, other._components
+        return this >= other
+
+    def __le__(self, other):
+        this, other = self._components, other._components
+        return this <= other
 
 
 def str_to_anytime(dt):
@@ -313,11 +346,19 @@ class TimeSeries(object):
                           ('minute', 'day'): 60 * 24.,
                           ('hour', 'day'): 24.}
 
-    SUPPORTED_FREQUENCIES = ['hour', 'day', 'month']
-    FREQUENCY_MAPPINGS = {'mon': 'month'}
+    SUPPORTED_FREQUENCIES = ['hour', 'day', 'month', 'year']
+    FREQUENCY_MAPPINGS = {'mon': 'month', 'yr': 'year'}
+
 
     def __init__(self, start, end, delta, calendar="standard"):
+        """
 
+        :param start: an instance of
+        :param end:
+        :param delta:
+        :param calendar:
+        """
+        self._check_date_times(*[start, end])
 
         self._clean_delta(delta)
         self.calendar = calendar
@@ -334,6 +375,17 @@ class TimeSeries(object):
             self._generate_time_series(start, end)
 
 
+    def _check_date_times(self, *times):
+        """
+        Asserts that each time is an instance of DateTimeAnyTime
+        :param times:
+        :return:
+        """
+        for tm in times:
+            if not isinstance(tm, DateTimeAnyTime):
+                raise TypeError("Datetimes must be of type: DateTimeAnyTime, not: {}".format(type(tm)))
+
+
     def _clean_delta(self, delta):
         """
 
@@ -343,11 +395,11 @@ class TimeSeries(object):
         if type(delta) not in (tuple, list) or len(delta) != 2:
             raise Exception('Delta must be tuple of (<number>, <time_unit>) such as: (3, "hour")')
 
-        if not delta[1] in self.SUPPORTED_FREQUENCIES:
-            raise Exception("Delta uses time frequency '{}' that is not yet supported.".format(delta[1]))
-
         if delta[1] in self.FREQUENCY_MAPPINGS:
             delta = (delta[0], self.FREQUENCY_MAPPINGS[delta[1]])
+
+        if not delta[1] in self.SUPPORTED_FREQUENCIES:
+            raise Exception("Delta uses time frequency '{}' that is not yet supported.".format(delta[1]))
 
         # Define simple class for holding the delta
         class Delta(object):
@@ -371,17 +423,26 @@ class TimeSeries(object):
             return (self.delta.n / self.CONVERSION_FACTORS[('hour', 'day')], 0, 0)
 
 
+    def _get_as_netcdf_time(self, anytime):
+        """
+        Converts the incoming DateTime/DateTimeAnyTime into a netCDF time object.
+        The base time unit and calendar set on the object are used.
+
+        :param anytime: an instance of DateTimeAnyTime or DateTime
+        :return: netCDF Time object (aware of calendars)
+        """
+        value = cf_units.date2num(anytime, self.base_time_unit, self.calendar)
+        return get_nc_datetime(value, self.base_time_unit, self.calendar)
+
+
     def _generate_time_series(self, start, end):
         """
-        Generator time series and stores in `self.series`
+        Generates time series and stores in `self.series`
 
         :return: None
         """
-        start_value = cf_units.date2num(start, self.base_time_unit, self.calendar)
-        end_value = cf_units.date2num(end, self.base_time_unit, self.calendar)
-
-        start = get_nc_datetime(start_value, self.base_time_unit, self.calendar)
-        end = get_nc_datetime(end_value, self.base_time_unit, self.calendar)
+        start = self._get_as_netcdf_time(start)
+        end = self._get_as_netcdf_time(end)
 
         delta = self._resolve_delta()
         current_time = start
@@ -391,14 +452,42 @@ class TimeSeries(object):
 
             # Now increment
             current_time += timedelta(*delta)
-            print delta, timedelta
-            print current_time, end
-
-
-    def _generate_time_series_year_delta(self, start, end):
-        pass
 
 
     def _generate_time_series_month_delta(self, start, end):
-        pass
+        """
+
+        :param start:
+        :param end:
+        :return:
+        """
+        current_time = start
+
+        while current_time <= end:
+            self.series.append(self._get_as_netcdf_time(current_time))
+
+            # Now increment
+            current_time.month += self.delta.n
+
+            # Cater for 12 months per year
+            if current_time.month > 12:
+                current_time.year += 1
+                current_time.month -= 12
+
+
+    def _generate_time_series_year_delta(self, start, end):
+        """
+
+        :param start:
+        :param end:
+        :return:
+        """
+        current_time = start
+
+        while current_time <= end:
+            self.series.append(self._get_as_netcdf_time(current_time))
+
+            # Now increment
+            current_time.year += self.delta.n
+
 
