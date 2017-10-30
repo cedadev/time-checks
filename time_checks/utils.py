@@ -350,10 +350,8 @@ class TimeSeries(object):
                           ('hour', 'day'): 24.}
 
     SUPPORTED_FREQUENCIES = ['hour', 'day', 'month', 'year']
-    FREQUENCY_MAPPINGS = {'mon': 'month', 'Amon': 'month', 'Omon': 'month',
-                          'yr': 'year', 'Ayr': 'year', 'Oyr': 'year',
-                          'hr': 'hour'
-                          }
+    FREQUENCY_MAPPINGS = {'mon': 'month',
+                          'yr': 'year'}
 
 
     def __init__(self, start, end, delta, calendar="standard"):
