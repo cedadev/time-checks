@@ -20,192 +20,115 @@ settings.supported_datasets.append(MockNCDataset)
 CMIP5_DATA_DIR = "test_data/cmip5"
 
 
-def test_multifile_1():
-    monthly_names = ['tas_Amon_HadGEM2-ES_historical_r1i1p1_185912-188411.nc',
+def _call_common_multifile_check(file_list):
+    """
+    Creates a set of Dataset objects from file list, calls multifile
+    check and returns result.
+
+    :param file_list: A list of file names
+    :return: Result from multifile check [boolean]
+    """
+    paths = [os.path.join(CMIP5_DATA_DIR, fname) for fname in file_list]
+    datasets = [Dataset(fpath) for fpath in paths]
+
+    result = check_multifile_temporal_continuity(datasets, time_index_in_name=-1)
+    return result
+
+
+def test_check_multifile_temporal_continuity_monthly_success_1():
+    file_names = ['tas_Amon_HadGEM2-ES_historical_r1i1p1_185912-188411.nc',
                      'tas_Amon_HadGEM2-ES_historical_r1i1p1_188412-190911.nc',
                      'tas_Amon_HadGEM2-ES_historical_r1i1p1_190912-193411.nc',
                      'tas_Amon_HadGEM2-ES_historical_r1i1p1_193412-195911.nc',
                      'tas_Amon_HadGEM2-ES_historical_r1i1p1_195912-198411.nc',
                      'tas_Amon_HadGEM2-ES_historical_r1i1p1_198412-200511.nc']
 
-    monthly_paths = [os.path.join(CMIP5_DATA_DIR, fname) for fname in monthly_names]
-    datasets = [Dataset(fpath) for fpath in monthly_paths]
-
-    result = check_multifile_temporal_continuity(datasets, time_index_in_name=-1)
-    assert(result == True)
+    result = _call_common_multifile_check(file_names)
+    assert(result is True)
 
 
-def test_check_multifile_temporal_continutity_success_1():
+def test_check_multifile_temporal_continuity_monthly_fail_1():
+    file_names = ['tas_Amon_HadGEM2-ES_historical_r1i1p1_185912-188411.nc',
+                     # Missing files here
+                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_198412-200511.nc']
 
-    yearly_names = ['tas_Oyr_HadGEM2-ES_historical_r1i1p1_1984-2005.nc',
-                    'tas_Oyr_HadGEM2-ES_historical_r1i1p1_1859-1884.nc',
-                    'tas_Oyr_HadGEM2-ES_historical_r1i1p1_1940-1983.nc',
-                    'tas_Oyr_HadGEM2-ES_historical_r1i1p1_1885-1939.nc']
+    result = _call_common_multifile_check(file_names)
+    assert(result is False)
 
-    monthly_names = ['tas_Amon_HadGEM2-ES_historical_r1i1p1_198501-200511.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_185912-188411.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_190912-193406.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_193407-195909.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_188412-190911.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_195910-198412.nc']
 
-    ####
-    #    NEEDS CALENDAR SUPPORT
-    #    360 day
-    #    no leap
-    #
-    ####
-    daily_names = [
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_18840101-19091212.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19091213-19341130.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19341201-19591231.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19600101-19841130.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19841201-20051130.nc',
-                   ]
+def test_check_multifile_temporal_continuity_day_success_1():
+    file_names = ['ua_day_IPSL-CM5A-LR_historical_r1i1p1_19500101-19591231.nc',
+                     'ua_day_IPSL-CM5A-LR_historical_r1i1p1_19600101-19691231.nc',
+                     'ua_day_IPSL-CM5A-LR_historical_r1i1p1_19700101-19791231.nc',
+                     'ua_day_IPSL-CM5A-LR_historical_r1i1p1_19800101-19891231.nc',
+                     'ua_day_IPSL-CM5A-LR_historical_r1i1p1_19900101-19991231.nc',
+                     'ua_day_IPSL-CM5A-LR_historical_r1i1p1_20000101-20051231.nc']
 
-    daily_names_2 = [
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_18840101-19091212.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19091213-19341130.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19341201-19591231.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19600101-19841130.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19841201-20051130.nc',
-                   ]
+    result = _call_common_multifile_check(file_names)
+    assert(result is True)
 
-    ####
-    #    NEEDS DAYS PER MONTH CALENDAR SUPPORT
-    #    360 day
-    #    no leap
-    #
-    ####
-    three_hourly_names = [
-                         'tas_3hr_HadGEM2-ES_historical_r1i1p1_190001010000-190001010300.nc',
-                         'tas_3hr_HadGEM2-ES_historical_r1i1p1_190001010600-190001012359.nc',
-                         'tas_3hr_HadGEM2-ES_historical_r1i1p1_190001020259-190001022359.nc',
-                         ]
 
-    six_hourly_names = [
-                        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001010000-190001010600.nc',
-                        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001011200-190001012359.nc',
-                        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001020559-190001030000.nc',
-                        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001030600-190001050000.nc',
-                       ]
+def test_check_multifile_temporal_continuity_day_fail_1():
+    file_names = ['ua_day_IPSL-CM5A-LR_historical_r1i1p1_19500101-19591231.nc',
+                  # Missing file here
+                  'ua_day_IPSL-CM5A-LR_historical_r1i1p1_19700101-19791231.nc']
 
-    #for fnames in [yearly_names, monthly_names, daily_names, three_hourly_names, six_hourly_names]:
-    for fnames in [daily_names_2]:
-        mock_dss = []
-        for fname in fnames:
-            mock_dss.append(MockNCDataset(fname))
+    result = _call_common_multifile_check(file_names)
+    assert(result is False)
 
-        assert(check_multifile_temporal_continuity(mock_dss, time_index_in_name=-1) == True)
 
-def test_check_multifile_temporal_continutity_fail_1():
+def test_check_multifile_temporal_continuity_yearly_success_1():
+    file_names = ['o2_Oyr_HadGEM2-CC_piControl_r1i1p1_1860-1959.nc',
+                  'o2_Oyr_HadGEM2-CC_piControl_r1i1p1_1960-2059.nc',
+                  'o2_Oyr_HadGEM2-CC_piControl_r1i1p1_2060-2099.nc']
 
-    """
-    Look for gaps
-    :return:
-    """
+    result = _call_common_multifile_check(file_names)
+    assert(result is True)
 
-    yearly_names = ['tas_Oyr_HadGEM2-ES_historical_r1i1p1_1984-2005.nc',
-                    'tas_Oyr_HadGEM2-ES_historical_r1i1p1_1859-1884.nc',
-                    'tas_Oyr_HadGEM2-ES_historical_r1i1p1_1941-1983.nc',
-                    'tas_Oyr_HadGEM2-ES_historical_r1i1p1_1885-1939.nc']
 
-    monthly_names = ['tas_Amon_HadGEM2-ES_historical_r1i1p1_188412-190911.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_185912-188411.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_190912-193411.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_195912-198411.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_193412-195911.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_198512-200511.nc']
+def test_check_multifile_temporal_continuity_yearly_fail_1():
+    file_names = ['o2_Oyr_HadGEM2-CC_piControl_r1i1p1_1860-1959.nc',
+                  # Missing file here
+                  'o2_Oyr_HadGEM2-CC_piControl_r1i1p1_2060-2099.nc'
+                  ]
 
-    ####
-    #    NEEDS CALENDAR SUPPORT
-    #    360 day
-    #    no leap
-    #
-    ####
-    daily_names = [
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_18840101-19091212.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19091214-19341130.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19341201-19591231.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19600101-19841130.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19841201-20051130.nc',
-                   ]
+    result = _call_common_multifile_check(file_names)
+    assert(result is False)
 
-    ####
-    #    NEEDS DAYS PER MONTH CALENDAR SUPPORT
-    #    360 day
-    #    no leap
-    #
-    ####
-    three_hourly_names = [
-                         'tas_3hr_HadGEM2-ES_historical_r1i1p1_190001010000-190001010300.nc',
-                         'tas_3hr_HadGEM2-ES_historical_r1i1p1_190001010700-190001012359.nc',
-                         'tas_3hr_HadGEM2-ES_historical_r1i1p1_190001020259-190001022359.nc',
-                         ]
 
-    six_hourly_names = [
-        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001010000-190001010600.nc',
-        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001011300-190001012359.nc',
-        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001020559-190001022359.nc',
-    ]
+def test_check_multifile_temporal_continuity_6hr_success_1():
+    file_names = ['psl_6hrPlev_HadGEM2-ES_rcp85_r1i1p1_2079120106-2080120100.nc',
+                  'psl_6hrPlev_HadGEM2-ES_rcp85_r1i1p1_2080120106-2081120100.nc',
+                  'psl_6hrPlev_HadGEM2-ES_rcp85_r1i1p1_2081120106-2082120100.nc',
+                  'psl_6hrPlev_HadGEM2-ES_rcp85_r1i1p1_2082120106-2083120100.nc',
+                  'psl_6hrPlev_HadGEM2-ES_rcp85_r1i1p1_2083120106-2084120100.nc',
+                  'psl_6hrPlev_HadGEM2-ES_rcp85_r1i1p1_2084120106-2085120100.nc',
+                  'psl_6hrPlev_HadGEM2-ES_rcp85_r1i1p1_2085120106-2086120100.nc',
+                  'psl_6hrPlev_HadGEM2-ES_rcp85_r1i1p1_2086120106-2087120100.nc',
+                  'psl_6hrPlev_HadGEM2-ES_rcp85_r1i1p1_2087120106-2088120100.nc',
+                  'psl_6hrPlev_HadGEM2-ES_rcp85_r1i1p1_2088120106-2089120100.nc',
+                  'psl_6hrPlev_HadGEM2-ES_rcp85_r1i1p1_2089120106-2090120100.nc',
+                  'psl_6hrPlev_HadGEM2-ES_rcp85_r1i1p1_2090120106-2091120100.nc',
+                  'psl_6hrPlev_HadGEM2-ES_rcp85_r1i1p1_2091120106-2092120100.nc',
+                  'psl_6hrPlev_HadGEM2-ES_rcp85_r1i1p1_2092120106-2093120100.nc',
+                  'psl_6hrPlev_HadGEM2-ES_rcp85_r1i1p1_2093120106-2094120100.nc',
+                  'psl_6hrPlev_HadGEM2-ES_rcp85_r1i1p1_2094120106-2095120100.nc',
+                  'psl_6hrPlev_HadGEM2-ES_rcp85_r1i1p1_2095120106-2096120100.nc',
+                  'psl_6hrPlev_HadGEM2-ES_rcp85_r1i1p1_2096120106-2097120100.nc',
+                  'psl_6hrPlev_HadGEM2-ES_rcp85_r1i1p1_2097120106-2098120100.nc',
+                  'psl_6hrPlev_HadGEM2-ES_rcp85_r1i1p1_2098120106-2099120100.nc',
+                  'psl_6hrPlev_HadGEM2-ES_rcp85_r1i1p1_2099120106-2100010100.nc']
 
-    for fnames in [yearly_names, monthly_names, daily_names, three_hourly_names, six_hourly_names]:
-        mock_dss = []
-        for fname in fnames:
-            mock_dss.append(MockNCDataset(fname))
+    result = _call_common_multifile_check(file_names)
+    assert(result is True)
 
-        assert(check_multifile_temporal_continuity(mock_dss, time_index_in_name=-1) == False)
 
-def test_check_multifile_temporal_continutity_fail_2():
-    """
-    Look for overlaps
-    :return:
-    """
+def test_check_multifile_temporal_continuity_6hr_fail_1():
+    file_names = ['psl_6hrPlev_HadGEM2-ES_rcp85_r1i1p1_2079120106-2080120100.nc',
+                  'psl_6hrPlev_HadGEM2-ES_rcp85_r1i1p1_2080120106-2081120100.nc',
+                  # Missing files here
+                  'psl_6hrPlev_HadGEM2-ES_rcp85_r1i1p1_2098120106-2099120100.nc',
+                  'psl_6hrPlev_HadGEM2-ES_rcp85_r1i1p1_2099120106-2100010100.nc']
 
-    yearly_names = ['tas_Oyr_HadGEM2-ES_historical_r1i1p1_1984-2005.nc',
-                    'tas_Oyr_HadGEM2-ES_historical_r1i1p1_1859-1884.nc',
-                    'tas_Oyr_HadGEM2-ES_historical_r1i1p1_1939-1983.nc',
-                    'tas_Oyr_HadGEM2-ES_historical_r1i1p1_1885-1939.nc']
-
-    monthly_names = ['tas_Amon_HadGEM2-ES_historical_r1i1p1_188412-190911.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_185912-188411.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_190912-193411.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_195912-198411.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_193412-195911.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_198411-200511.nc']
-
-    ####
-    #    NEEDS CALENDAR SUPPORT
-    #    360 day
-    #    no leap
-    #
-    ####
-    daily_names = [
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_18840101-19091212.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19091212-19341130.nc'
-                   ]
-
-    ####
-    #    NEEDS DAYS PER MONTH CALENDAR SUPPORT
-    #    360 day
-    #    no leap
-    #
-    ####
-    three_hourly_names = [
-                         'tas_3hr_HadGEM2-ES_historical_r1i1p1_190001010000-190001010300.nc',
-                         'tas_3hr_HadGEM2-ES_historical_r1i1p1_190001010300-190001012359.nc',
-                         'tas_3hr_HadGEM2-ES_historical_r1i1p1_190001020259-190001022359.nc',
-                         ]
-
-    six_hourly_names = [
-        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001010000-190001010600.nc',
-        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001010600-190001012359.nc',
-        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001020559-190001022359.nc',
-    ]
-
-    for fnames in [yearly_names, monthly_names, daily_names, three_hourly_names, six_hourly_names]:
-        mock_dss = []
-        for fname in fnames:
-            mock_dss.append(MockNCDataset(fname))
-
-        assert(check_multifile_temporal_continuity(mock_dss, time_index_in_name=-1) == False)
+    result = _call_common_multifile_check(file_names)
+    assert(result is False)

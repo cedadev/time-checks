@@ -13,3 +13,23 @@ CMOR_TABLES_FORMAT = {'3hr': 12, '6hrLev': 10, '6hrPLev': 10, 'Amon': 6, 'LImon'
                       'day': 8, 'fx': 0}
 IRREGULAR_MONTHLY_CALENDARS = ['gregorian', 'proleptic_gregorian', 'julian', 'noleap', '365_day', 'standard']
 VALID_MONTHLY_TIME_DIFFERENCES = [29.5, 30.5, 31.0]
+
+FREQUENCY_MAPPINGS = {
+    '3hr': (0.125, 'day'),
+    '6hrLev': (0.25, 'day'),
+    '6hrPlev': (0.25, 'day'),
+    'Amon': (1, 'month'),
+    'LImon': (1, 'month'),
+    'Lmon': (1, 'month'),
+    'OImon': (1, 'month'),
+    'Omon': (1, 'month'),
+    'Oyr': (1, 'year'),
+    'aero': None,
+    'cf3hr': (3, 'hour'),
+    'cfDay': (1, 'day'),
+    'cfMon': (1, 'month'),
+    'cfOff': None,
+    'cfSites': None,
+    'day': (1, 'day'),
+    'fx': None
+}

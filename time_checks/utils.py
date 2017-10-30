@@ -7,22 +7,25 @@ import arrow
 import cf_units
 from netCDF4 import Dataset, num2date
 
-from time_checks import time_utils
+from time_checks import time_utils, constants
 
 
-def get_details_from_file_name(fname, time_index_in_name=-1, frequency_index=1):
+def get_start_end_freq(finfo, time_index_in_name=-1, frequency_index=1):
     """
-    Returns a tuple of ((start, end), frequency) parsed from file name.
+    Returns a tuple of ((start, end), frequency) parsed from file name
+    or file name component list.
 
-    :param fname: File name or path
+    :param finfo: File name/path or file name component list
     :param time_index_in_name: index of time component in file name
     :param frequency_index: index of frequency component in file name
     :return: Tuple of: ((start, end), frequency)
     """
-    fname = os.path.splitext(os.path.basename(fname))[0]
+    if type(finfo) is str:
+        fname = os.path.splitext(os.path.basename(finfo))[0]
+        finfo = fname.split("_")
 
-    start, end = fname.split("_")[time_index_in_name].split("-")
-    frequency = fname.split("_")[frequency_index]
+    start, end = finfo[time_index_in_name].split("-")
+    frequency = finfo[frequency_index]
 
     return (start, end), frequency
 
@@ -347,7 +350,10 @@ class TimeSeries(object):
                           ('hour', 'day'): 24.}
 
     SUPPORTED_FREQUENCIES = ['hour', 'day', 'month', 'year']
-    FREQUENCY_MAPPINGS = {'mon': 'month', 'yr': 'year'}
+    FREQUENCY_MAPPINGS = {'mon': 'month', 'Amon': 'month', 'Omon': 'month',
+                          'yr': 'year', 'Ayr': 'year', 'Oyr': 'year',
+                          'hr': 'hour'
+                          }
 
 
     def __init__(self, start, end, delta, calendar="standard"):
@@ -491,3 +497,15 @@ class TimeSeries(object):
             current_time.year += self.delta.n
 
 
+def map_frequency(frequency):
+    """
+
+    :param frequency:
+    :return:
+    """
+    mapped_frequency = constants.FREQUENCY_MAPPINGS.get(frequency, None)
+
+    if not mapped_frequency:
+        raise Exception("Cannot find a valid frequency mapping for: {}".format(frequency))
+
+    return mapped_frequency
