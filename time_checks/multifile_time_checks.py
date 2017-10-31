@@ -13,13 +13,20 @@ import arrow
 import cf_units
 
 from time_checks import utils
+from time_checks.utils import resolve_dataset_type
 
 
+@resolve_dataset_type
 def check_multifile_temporal_continuity(dss, time_index_in_name=-1, frequency_index=1):
     """
-    """
-    dss = [utils._resolve_dataset_type(ds) for ds in dss]
+    Takes a sequence of Datasets and checks that there is temporal continuity
+    between the file names and the contents of the files.
 
+    :param dss: sequence of Dataset objects [dictionary or NetCDF4 Dataset]
+    :param time_index_in_name: index of the time component in the file names
+    :param frequency_index: index of the frequency component in the file names
+    :return: Boolean (Success or Failure)
+    """
     # Sort the datasets by file name just in case files have been provided in a strange order
     dss_by_name = [(ds['filename'], ds) for ds in dss]
     dss_by_name.sort()
@@ -48,7 +55,7 @@ def check_multifile_temporal_continuity(dss, time_index_in_name=-1, frequency_in
         f_mapped_frequency = utils.map_frequency(f_frequency)
         f_series = utils.TimeSeries(f_start, f_end, f_mapped_frequency, calendar).series
 
-        print len(series), len(f_series)
+        # If file series is longer than remaining full series then fail
         if len(f_series) > len(series):
             return False
 
@@ -69,4 +76,3 @@ def check_multifile_temporal_continuity(dss, time_index_in_name=-1, frequency_in
     if series: return False
 
     return True
-

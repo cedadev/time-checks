@@ -2,6 +2,7 @@
 import os
 import re
 from datetime import timedelta
+from functools import wraps
 
 import arrow
 import cf_units
@@ -30,44 +31,55 @@ def get_start_end_freq(finfo, time_index_in_name=-1, frequency_index=1):
     return (start, end), frequency
 
 
-def _resolve_dataset_type(ds):
+def resolve_dataset_type(func):
     """
-    _resolve_dataset_type
+    Decorator to resolve the dataset type to a standard dictionary format.
 
-    This funtion analyses type of dataset (ds)
+    The decorator function analyses type of dataset (ds)
         - a netCDF4 Dataset
         - a MockNCDataset - used in testing only
         - a compliant dictionary in the form used by this class
           and used to interface with CEDA-CC
 
+    It converts all to a dictionary in a standard format used by the checks.
 
-    :param ds: a dataset object [type anyalysed in this routine]
-    :return: ds [dictonary]
+    :param ds: a dataset object [type analysed here]
+    :return: ds [dictionary]
     """
+    @wraps(func)
 
-    # First if clause required for testing only - will remove in due course
-    if isinstance(ds, Dataset):
-        ds = _convert_dataset_to_dict(ds)
-    elif hasattr(ds, 'filepath'):
-        ds = {"time": {
-                    "_type": "float64",
-                    "bounds": "time_bnds",
-                    "long_name": "time",
-                    "standard_name": "time",
-                    "units": "days since 1850-01-01",
-                    "calendar": "360_day",
-                    "_data": [],
-                    "axis": "T"},
-              "filename": os.path.splitext(os.path.basename(ds.filepath()))[0].split("_")}
-    elif isinstance(ds, dict):
-        # TODO: Check dictionary is of valid form
-        pass
+    def wrapper(datasets, **kwargs):
 
-    else:
-        raise Exception("Unsupported data type. "
-                        "Data types supported are netCDF4 objects or CEDA-CC compliant dictionary objects")
+        # First argument can be a list/tuple of objects of a single one.
+        # So convert all to a list
+        single_arg = False
+        if type(datasets) not in (tuple, list):
+            single_arg = True
+            datasets = [datasets]
 
-    return ds
+        # Loop through all and convert them
+        converted_datasets = []
+
+        for ds in datasets:
+            if isinstance(ds, Dataset):
+                ds = _convert_dataset_to_dict(ds)
+            elif hasattr(ds, 'filepath'):
+                # If it is a MockDataset, only set the 'filename'
+                ds = {"filename": os.path.splitext(os.path.basename(ds.filepath()))[0].split("_")}
+            elif isinstance(ds, dict):
+                pass
+            else:
+                raise Exception("Unsupported data type. "
+                                "Data types supported are netCDF4 objects or CEDA-CC compliant dictionary objects")
+
+            converted_datasets.append(ds)
+
+        if single_arg:
+            return func(converted_datasets[0], **kwargs)
+        else:
+            return func(converted_datasets, **kwargs)
+    
+    return wrapper
 
 
 def _get_nc_attr(var, attr, default=""):
@@ -507,3 +519,28 @@ def map_frequency(frequency):
         raise Exception("Cannot find a valid frequency mapping for: {}".format(frequency))
 
     return mapped_frequency
+
+
+def calculate_delta_time_series(times, valid_dt):
+    """
+       calculate_delta_time_series
+
+    This function calculates the differences between all the elements of a timeseries and
+    compares the differences with a valid time difference.
+
+    True is returned if all the differences are valid; i.e. equal to the valid time difference argument
+    False is returned if any of the difference fail to match the valid the time difference argument
+
+    :param times: List of times
+    :param valid_dt: Valid time difference, usually scalar, list of valid times supported
+    :return: boolean [True for success]
+    """
+
+    t = 0
+    while t < len(times) - 1:
+        t_diff = times[t + 1] - times[t]
+        if t_diff not in valid_dt:
+            return False
+        else:
+            return True
+

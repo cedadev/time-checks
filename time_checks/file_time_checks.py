@@ -10,8 +10,9 @@ import arrow
 from netCDF4 import Dataset, num2date
 
 from time_checks import utils, constants
+from time_checks.utils import resolve_dataset_type
 
-
+@resolve_dataset_type
 def check_file_name_time_format(ds, time_index_in_name=-1):
     """
         check_file_name_time_format
@@ -29,7 +30,7 @@ def check_file_name_time_format(ds, time_index_in_name=-1):
     :return: boolean (True for success).
     """
 
-    ds = utils._resolve_dataset_type(ds)
+###    ds = utils._resolve_dataset_type(ds)
     time_comp = ds['filename'][time_index_in_name]
 
     for regex in constants.FILE_NAME_REGEXES:
@@ -39,6 +40,7 @@ def check_file_name_time_format(ds, time_index_in_name=-1):
     return False
 
 
+@resolve_dataset_type
 def check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:1'):
     """
         check_file_name_matches_time_var
@@ -54,7 +56,7 @@ def check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:
     :return: boolean [True for success]
     """
 
-    ds = utils._resolve_dataset_type(ds)
+##    ds = utils._resolve_dataset_type(ds)
     time_var = ds["time"]["_data"]
     time_comp = ds['filename'][time_index_in_name]
     calendar = ds["time"]["calendar"]
@@ -72,6 +74,7 @@ def check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:
     return True
 
 
+@resolve_dataset_type
 def check_time_format_matches_frequency(ds, frequency_index=1, time_index_in_name=-1):
     """
         check_time_format_matches_frequency
@@ -93,7 +96,7 @@ def check_time_format_matches_frequency(ds, frequency_index=1, time_index_in_nam
     :return: boolean [True for success]
     """
 
-    ds = utils._resolve_dataset_type(ds)
+##    ds = utils._resolve_dataset_type(ds)
     time_comp = ds['filename'][time_index_in_name]
     frequency = ds['filename'][frequency_index]
 
@@ -103,6 +106,7 @@ def check_time_format_matches_frequency(ds, frequency_index=1, time_index_in_nam
     return False
 
 
+@resolve_dataset_type
 def check_valid_temporal_element(ds, time_index_in_name=-1):
     """
         check_valid_temporal_element
@@ -118,7 +122,7 @@ def check_valid_temporal_element(ds, time_index_in_name=-1):
     :return: boolean [True for success]
     """
 
-    ds = utils._resolve_dataset_type(ds)
+##    ds = utils._resolve_dataset_type(ds)
     time_comp = ds['filename'][time_index_in_name]
 
     for time_element in time_comp.split('-'):
@@ -148,30 +152,8 @@ def check_valid_temporal_element(ds, time_index_in_name=-1):
 
     return True
 
-def calculate_delta_time_series(times, valid_dt):
-    """
-       calculate_delta_time_series
 
-    This function calculates the differences between all the elements of a timeseries and
-    compares the differences with a valid time difference.
-
-    True is returned if all the differences are valid; i.e. equal to the valid time difference argument
-    False is returned if any of the difference fail to match the valid the time difference argument
-
-    :param times: List of times
-    :param valid_dt: Valid time difference, usually scalar, list of valid times supported
-    :return: boolean [True for success]
-    """
-
-    t = 0
-    while t < len(times) - 1:
-        t_diff = times[t + 1] - times[t]
-        if t_diff not in valid_dt:
-            return False
-        else:
-            return True
-
-
+@resolve_dataset_type
 def check_regular_time_axis_increments(ds, frequency_index=1):
     """
        check_regular_time_axis_increments
@@ -189,7 +171,7 @@ def check_regular_time_axis_increments(ds, frequency_index=1):
     :return: boolean [True for success]
     """
 
-    ds = utils._resolve_dataset_type(ds)
+##    ds = utils._resolve_dataset_type(ds)
     frequency = ds['filename'][frequency_index]
     calendar = ds["time"]["calendar"]
     times = ds["time"]["_data"]
@@ -197,9 +179,9 @@ def check_regular_time_axis_increments(ds, frequency_index=1):
     delta_t = [times[1] - times[0]]
 
     if frequency == 'mon' and calendar in constants.IRREGULAR_MONTHLY_CALENDARS:
-        result = calculate_delta_time_series(times, constants.VALID_MONTHLY_TIME_DIFFERENCES)
+        result = utils.calculate_delta_time_series(times, constants.VALID_MONTHLY_TIME_DIFFERENCES)
 
     else:
-        result = calculate_delta_time_series(times, delta_t)
+        result = utils.calculate_delta_time_series(times, delta_t)
 
     return result
