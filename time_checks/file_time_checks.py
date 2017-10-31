@@ -12,6 +12,7 @@ from netCDF4 import Dataset, num2date
 from time_checks import utils, constants
 from time_checks.utils import resolve_dataset_type
 
+
 @resolve_dataset_type
 def check_file_name_time_format(ds, time_index_in_name=-1):
     """
@@ -29,8 +30,6 @@ def check_file_name_time_format(ds, time_index_in_name=-1):
     :param time_index_in_name: index of time component in the file name [int]
     :return: boolean (True for success).
     """
-
-###    ds = utils._resolve_dataset_type(ds)
     time_comp = ds['filename'][time_index_in_name]
 
     for regex in constants.FILE_NAME_REGEXES:
@@ -55,8 +54,6 @@ def check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:
     :param tolerance: tolerance of time difference allowed in match [string]
     :return: boolean [True for success]
     """
-
-##    ds = utils._resolve_dataset_type(ds)
     time_var = ds["time"]["_data"]
     time_comp = ds['filename'][time_index_in_name]
     calendar = ds["time"]["calendar"]
@@ -95,8 +92,6 @@ def check_time_format_matches_frequency(ds, frequency_index=1, time_index_in_nam
     :param ds: input dataset [netCDF4 Dataset object (also MockNCDataset) or compliant dictionary]
     :return: boolean [True for success]
     """
-
-##    ds = utils._resolve_dataset_type(ds)
     time_comp = ds['filename'][time_index_in_name]
     frequency = ds['filename'][frequency_index]
 
@@ -121,8 +116,6 @@ def check_valid_temporal_element(ds, time_index_in_name=-1):
     :param time_index_in_name: index of time component in the file name [int]
     :return: boolean [True for success]
     """
-
-##    ds = utils._resolve_dataset_type(ds)
     time_comp = ds['filename'][time_index_in_name]
 
     for time_element in time_comp.split('-'):
@@ -170,8 +163,6 @@ def check_regular_time_axis_increments(ds, frequency_index=1):
                             (actually the cmor table, frequency must be implied from this) [int]
     :return: boolean [True for success]
     """
-
-##    ds = utils._resolve_dataset_type(ds)
     frequency = ds['filename'][frequency_index]
     calendar = ds["time"]["calendar"]
     times = ds["time"]["_data"]

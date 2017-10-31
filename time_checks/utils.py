@@ -150,41 +150,6 @@ def _convert_dataset_to_dict(ds):
     return dict
 
 
-def OLD_parse_time_new(time_element, units="day since 1850-01-01", calendar="standard"):
-    """
-        _parse_time
-
-    Parses time component string to an arrow date time object.
-
-    :param tm: date-time [string]
-    :return: datetime [arrow object]
-    """
-    # If already formatted then just parse and return since "-" is a component in arrow times.
-    if "-" in tm:
-        return arrow.get(tm)
-
-    # try doing something with just strings
-
-    # Otherwise, reformat then parse
-    padded_time = tm + "00000101000000"[len(tm):]
-    splits = [4, 2, 2, 2, 2, 2]
-    splits.reverse()  # so we can pop them off the end
-
-    items = []
-    while padded_time:
-        i = splits.pop()
-        item = padded_time[:i]
-        padded_time = padded_time[i:]
-        items.append(item)
-
-    formatted_time = "{}-{}-{}T{}:{}:{}".format(*items)
-
-    # Else do it with the actual time and units and calendar
-    t = cf_units.num2date(time_comp, units, calendar)
-
-    return arrow.get(t.year, t.month, t.day, t.hour, t.minute, t.second)
-
-
 def _parse_time(tm):
     """
     Parses time component string to an arrow date time object.
