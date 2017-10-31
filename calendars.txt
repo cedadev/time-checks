@@ -1,0 +1,13 @@
+Calendars in CMIP5
+==================
+
+Calendar	Model	E.g. path
+---------------------------------
+julian	MPI-ESM-LR	/badc/cmip5/data/cmip5/output1/NOAA-GFDL/GFDL-CM2p1/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GFDL-CM2p1_historical_r1i1p1_200601-201012.nc
+noleap	BCC-CSM1-1	/badc/cmip5/data/cmip5/output1/BCC/bcc-csm1-1/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_bcc-csm1-1_historical_r1i1p1_185001-201212.nc
+365_day	CanESM2	/badc/cmip5/data/cmip5/output1/CCCma/CanESM2/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CanESM2_historical_r1i1p1_185001-200512.nc
+standard	CMCC-CESM	/badc/cmip5/data/cmip5/output1/CMCC/CMCC-CESM/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CMCC-CESM_historical_r1i1p1_200501-200512.nc
+gregorian	CNRM-CERFACS	/badc/cmip5/data/cmip5/output1/CNRM-CERFACS/CNRM-CM5/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CNRM-CM5_historical_r1i1p1_190001-194912.nc
+proleptic_gregorian	CSIRO-BOM	/badc/cmip5/data/cmip5/output1/CSIRO-BOM/ACCESS1-3/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_ACCESS1-3_historical_r1i1p1_185001-200512.nc
+360_day	MOHC	/badc/cmip5/data/cmip5/output1/MOHC/HadGEM2-ES/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_HadGEM2-ES_historical_r1i1p1_190912-193411.nc
+

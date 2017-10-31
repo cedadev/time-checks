@@ -37,7 +37,7 @@ def test_str_to_anytime_microsecond():
 def test_str_to_anytime_failures():
     for dt in ("01/01/2017", "", 1999):
         try:
-            resp = utils.str_to_anytime(dt)
+            _ = utils.str_to_anytime(dt)
             worked = True
         except:
             worked = False
