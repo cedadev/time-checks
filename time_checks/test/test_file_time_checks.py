@@ -8,7 +8,6 @@ Tests for the checks in the `file_time_checks.py` module.
 from netCDF4 import Dataset
 
 from time_checks.file_time_checks import *
-from time_checks.multifile_time_checks import *
 from time_checks.test.mock_netcdf import MockNCDataset
 from time_checks import utils, time_utils, settings, constants
 
@@ -17,12 +16,11 @@ settings.supported_datasets.append(MockNCDataset)
 
 
 def test_check_file_name_time_format_fail_1():
-
-
     eg_names = [
         "mrsos_day_HadGEM2-ES_historical_r1i1p1_19991201-2005.nc",
         "hopeful",
-        "20040101011.nc"
+        "20040101011.nc",
+        "/badc/data/something-19990909-19990909.nc"
     ]
 
     for fname in eg_names:
@@ -35,7 +33,8 @@ def test_check_file_name_time_format_success_1():
                 "mrsos_mon_HadGEM2-ES_historical_r1i1p1_199912-200511.nc",
                 "mrsos_day_HadGEM2-ES_historical_r1i1p1_19991201-20051130.nc",
                 "mrsos_3hr_HadGEM2-ES_historical_r1i1p1_199912010101-200511302359.nc",
-                "mrsos_6hr_HadGEM2-ES_historical_r1i1p1_199912010304-200511300501.nc"]
+                "mrsos_6hr_HadGEM2-ES_historical_r1i1p1_199912010304-200511300501.nc",
+                "/badc/data/something_19990909-19990910.nc"]
 
     for fname in eg_names:
         mock_ds = MockNCDataset(fname)
@@ -43,12 +42,12 @@ def test_check_file_name_time_format_success_1():
 
 
 def test_check_file_name_matches_time_var_success_1():
-    ds = Dataset('/badc/cmip5/data/cmip5/output1/MOHC/HadGEM2-ES/historical/day/land/day/r1i1p1/latest/mrsos/mrsos_day_HadGEM2-ES_historical_r1i1p1_19991201-20051130.nc')
+    ds = Dataset('/data/time-checks/mrsos_day_HadGEM2-ES_historical_r1i1p1_19991201-20051130.nc')
     assert(check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:1') == True)
 
 
 def test_check_file_name_matches_time_var_fail_1():
-    ds = Dataset('/badc/cmip5/data/cmip5/output1/MOHC/HadGEM2-ES/historical/day/land/day/r1i1p1/latest/mrsos/mrsos_day_HadGEM2-ES_historical_r1i1p1_19991201-20051130.nc')
+    ds = Dataset('/data/time-checks/mrsos_day_HadGEM2-ES_historical_r1i1p1_19991201-20051130.nc')
     assert(check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='hours:1') == False)
 
 
@@ -67,7 +66,7 @@ def test_check_time_format_matches_frequency_success_1():
 
 
 def test_check_time_format_matches_frequency_fail_1():
-    
+
     eg_names = ['mrsos_Oyr_HadGEM2-ES_historical_r1i1p1_19991201-20051130.nc',
                 'mrsos_3hr_HadGEM2-ES_historical_r1i1p1_1999-2005.nc',
                 'mrsos_6hrLev_HadGEM2-ES_historical_r1i1p1_199912-200511.nc',
@@ -80,14 +79,36 @@ def test_check_time_format_matches_frequency_fail_1():
         assert(check_time_format_matches_frequency(mock_ds, frequency_index=1, time_index_in_name=-1) == False)
 
 
-def test_check_regular_time_axis_increments_success_1():
-    ds = Dataset('/badc/cmip5/data/cmip5/output1/MOHC/HadGEM2-ES/historical/day/land/day/r1i1p1/latest/mrsos/mrsos_day_HadGEM2-ES_historical_r1i1p1_19991201-20051130.nc')
-    assert(check_regular_time_axis_increments(ds, frequency_index=1) == True)
+def test_check_time_format_matches_frequency_test_all_combinations():
 
+    positives = [('Oyr', '1999-2005'),
+                 ('Amon', '199912-200511'),
+                 ('monClim', '199912-200511'),
+                 ('day', '19991201-20051130'),
+                 ('3hr', '199912010101-200511300101'),
+                 ('subhr', '199912010101-200511300101'),
+                 ('6hrLev', '1999120101-2005113001')]
+    frequencies = ('Oyr', 'Amon', 'day', '3hr', '6hrLev')
+    time_ranges = ('1999-2005', '199912-200511', '19991201-20051130',
+                   '199912010101-200511300101', '1999120101-2005113001')
+
+    all_combos = [(frequency, time_range) for frequency in frequencies for time_range in time_ranges]
+
+    for frequency, time_range in all_combos:
+        fname = 'mrsos_{}_HadGEM2-ES_historical_r1i1p1_{}.nc'.format(frequency, time_range)
+        mock_ds = MockNCDataset(fname)
+        expected_result = (frequency, time_range) in positives
+        result = check_time_format_matches_frequency(mock_ds, frequency_index=1, time_index_in_name=-1)
+        assert(result == expected_result)
+
+def test_check_regular_time_axis_increments_success_1():
+    ds = Dataset('/data/time-checks/mrsos_day_HadGEM2-ES_historical_r1i1p1_19991201-20051130.nc')
+    assert(check_regular_time_axis_increments(ds, frequency_index=1) == True)
+### NEEDS COVERAGE FOR DIFFERENT CALENDARS
 
 def test_check_regular_time_axis_increments_fail_1():
     pass
-
+### NEEDS COVERAGE FOR DIFFERENT CALENDARS
 
 def test_check_valid_temporal_element_success_1():
     eg_names = ['mrsos_Oyr_HadGEM2-ES_historical_r1i1p1_1999-2005.nc',
@@ -100,8 +121,6 @@ def test_check_valid_temporal_element_success_1():
     for fname in eg_names:
         mock_ds = MockNCDataset(fname)
         assert(check_valid_temporal_element(mock_ds, time_index_in_name=-1) == True)
-
-
 
 def test_check_valid_temporal_element_fail_1():
     eg_names = ['mrsos_Oyr_HadGEM2-ES_historical_r1i1p1_1999-4005.nc',
@@ -116,180 +135,3 @@ def test_check_valid_temporal_element_fail_1():
         assert(check_valid_temporal_element(mock_ds, time_index_in_name=-1) == False)
 
 
-def test_check_multifile_temporal_continutity_success_1():
-
-    yearly_names = ['tas_Oyr_HadGEM2-ES_historical_r1i1p1_1984-2005.nc',
-                    'tas_Oyr_HadGEM2-ES_historical_r1i1p1_1859-1884.nc',
-                    'tas_Oyr_HadGEM2-ES_historical_r1i1p1_1940-1983.nc',
-                    'tas_Oyr_HadGEM2-ES_historical_r1i1p1_1885-1939.nc']
-
-    monthly_names = ['tas_Amon_HadGEM2-ES_historical_r1i1p1_198501-200511.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_185912-188411.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_190912-193406.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_193407-195909.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_188412-190911.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_195910-198412.nc']
-
-    ####
-    #    NEEDS CALENDAR SUPPORT
-    #    360 day
-    #    no leap
-    #
-    ####
-    daily_names = [
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_18840101-19091212.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19091213-19341130.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19341201-19591231.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19600101-19841130.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19841201-20051130.nc',
-                   ]
-
-    daily_names_2 = [
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_18840101-19091212.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19091213-19341130.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19341201-19591231.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19600101-19841130.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19841201-20051130.nc',
-                   ]
-
-    ####
-    #    NEEDS DAYS PER MONTH CALENDAR SUPPORT
-    #    360 day
-    #    no leap
-    #
-    ####
-    three_hourly_names = [
-                         'tas_3hr_HadGEM2-ES_historical_r1i1p1_190001010000-190001010300.nc',
-                         'tas_3hr_HadGEM2-ES_historical_r1i1p1_190001010600-190001012359.nc',
-                         'tas_3hr_HadGEM2-ES_historical_r1i1p1_190001020259-190001022359.nc',
-                         ]
-
-    six_hourly_names = [
-                        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001010000-190001010600.nc',
-                        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001011200-190001012359.nc',
-                        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001020559-190001030000.nc',
-                        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001030600-190001050000.nc',
-                       ]
-
-    #for fnames in [yearly_names, monthly_names, daily_names, three_hourly_names, six_hourly_names]:
-    for fnames in [daily_names_2]:
-        mock_dss = []
-        for fname in fnames:
-            mock_dss.append(MockNCDataset(fname))
-
-        assert(check_multifile_temporal_continutity(mock_dss, time_index_in_name=-1) == True)
-
-def test_check_multifile_temporal_continutity_fail_1():
-
-    """
-    Look for gaps
-    :return:
-    """
-
-    yearly_names = ['tas_Oyr_HadGEM2-ES_historical_r1i1p1_1984-2005.nc',
-                    'tas_Oyr_HadGEM2-ES_historical_r1i1p1_1859-1884.nc',
-                    'tas_Oyr_HadGEM2-ES_historical_r1i1p1_1941-1983.nc',
-                    'tas_Oyr_HadGEM2-ES_historical_r1i1p1_1885-1939.nc']
-
-    monthly_names = ['tas_Amon_HadGEM2-ES_historical_r1i1p1_188412-190911.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_185912-188411.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_190912-193411.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_195912-198411.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_193412-195911.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_198512-200511.nc']
-
-    ####
-    #    NEEDS CALENDAR SUPPORT
-    #    360 day
-    #    no leap
-    #
-    ####
-    daily_names = [
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_18840101-19091212.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19091214-19341130.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19341201-19591231.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19600101-19841130.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19841201-20051130.nc',
-                   ]
-
-    ####
-    #    NEEDS DAYS PER MONTH CALENDAR SUPPORT
-    #    360 day
-    #    no leap
-    #
-    ####
-    three_hourly_names = [
-                         'tas_3hr_HadGEM2-ES_historical_r1i1p1_190001010000-190001010300.nc',
-                         'tas_3hr_HadGEM2-ES_historical_r1i1p1_190001010700-190001012359.nc',
-                         'tas_3hr_HadGEM2-ES_historical_r1i1p1_190001020259-190001022359.nc',
-                         ]
-
-    six_hourly_names = [
-        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001010000-190001010600.nc',
-        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001011300-190001012359.nc',
-        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001020559-190001022359.nc',
-    ]
-
-    for fnames in [yearly_names, monthly_names, daily_names, three_hourly_names, six_hourly_names]:
-        mock_dss = []
-        for fname in fnames:
-            mock_dss.append(MockNCDataset(fname))
-
-        assert(check_multifile_temporal_continutity(mock_dss, time_index_in_name=-1) == False)
-
-def test_check_multifile_temporal_continutity_fail_2():
-    """
-    Look for overlaps
-    :return:
-    """
-
-    yearly_names = ['tas_Oyr_HadGEM2-ES_historical_r1i1p1_1984-2005.nc',
-                    'tas_Oyr_HadGEM2-ES_historical_r1i1p1_1859-1884.nc',
-                    'tas_Oyr_HadGEM2-ES_historical_r1i1p1_1939-1983.nc',
-                    'tas_Oyr_HadGEM2-ES_historical_r1i1p1_1885-1939.nc']
-
-    monthly_names = ['tas_Amon_HadGEM2-ES_historical_r1i1p1_188412-190911.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_185912-188411.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_190912-193411.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_195912-198411.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_193412-195911.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_198411-200511.nc']
-
-    ####
-    #    NEEDS CALENDAR SUPPORT
-    #    360 day
-    #    no leap
-    #
-    ####
-    daily_names = [
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_18840101-19091212.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19091212-19341130.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19341201-19591231.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19600101-19841130.nc',
-                   'tas_day_HadGEM2-ES_historical_r1i1p1_19841201-20051130.nc',
-                   ]
-
-    ####
-    #    NEEDS DAYS PER MONTH CALENDAR SUPPORT
-    #    360 day
-    #    no leap
-    #
-    ####
-    three_hourly_names = [
-                         'tas_3hr_HadGEM2-ES_historical_r1i1p1_190001010000-190001010300.nc',
-                         'tas_3hr_HadGEM2-ES_historical_r1i1p1_190001010300-190001012359.nc',
-                         'tas_3hr_HadGEM2-ES_historical_r1i1p1_190001020259-190001022359.nc',
-                         ]
-
-    six_hourly_names = [
-        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001010000-190001010600.nc',
-        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001010600-190001012359.nc',
-        'tas_6hrLev_HadGEM2-ES_historical_r1i1p1_190001020559-190001022359.nc',
-    ]
-
-    for fnames in [yearly_names, monthly_names, daily_names, three_hourly_names, six_hourly_names]:
-        mock_dss = []
-        for fname in fnames:
-            mock_dss.append(MockNCDataset(fname))
-
-        assert(check_multifile_temporal_continutity(mock_dss, time_index_in_name=-1) == False)

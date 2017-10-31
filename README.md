@@ -16,14 +16,14 @@ The full list of checks managed by this package are provided below:
 
 ### Single file tests
 
-```
-temporal_subset must contain two components in the form "start"-"end", separated by "-"
-The structure of "start" and "end" must be of the form yyyy[MM[dd[hh[mm]]]]
-"start" and "end" must have the same the structure
-variable_table = "fx": time independent data will not have a temporal element
-variable_table = "yr": yearly data of the form: yyyy
-variable_table = "mon": monthly data of the form: yyyyMM
-variable_table = "monClim": monthly climatology data of the form: yyyyMM
+The single file tests are:
+ - The temporal subset must contain two components in the form "start"-"end", separated by "-"
+ - The structure of "start" and "end" must be of the form yyyy[MM[dd[hh[mm]]]]
+ - "start" and "end" must have the same the structure
+ - variable_table = "fx": time independent data will not have a temporal element
+ - variable_table = "yr": yearly data of the form: yyyy
+ - variable_table = "mon": monthly data of the form: yyyyMM
+ - variable_table = "monClim": monthly climatology data of the form: yyyyMM
 variable_table = "day": daily data of the form: yyyyMMdd
 variable_table = "6hr": 6 hourly data of the form: yyyyMMddhh
 variable_table = "3hr": 3 hourly data of the form: yyyyMMddhhmm
@@ -55,6 +55,14 @@ rcp85	RCP8.5	2006-2300	295
 rcp26	RCP2.6	2006-2300	295
 rcp60	RCP6.0	2006-2100	94
 ```
+
+## Support for calendars
+
+The library currently supports two calendars:
+ - standard
+ - 360-day
+
+Support can be added for other calendars as required.
 
 ## Installation
 
