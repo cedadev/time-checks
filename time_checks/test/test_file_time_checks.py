@@ -42,12 +42,12 @@ def test_check_file_name_time_format_success_1():
 
 
 def test_check_file_name_matches_time_var_success_1():
-    ds = Dataset('/data/time-checks/mrsos_day_HadGEM2-ES_historical_r1i1p1_19991201-20051130.nc')
+    ds = Dataset('test_data/cmip5/mrsos_day_HadGEM2-ES_historical_r1i1p1_19991201-20051130.nc')
     assert(check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:1') is True)
 
 
 def test_check_file_name_matches_time_var_fail_1():
-    ds = Dataset('/data/time-checks/mrsos_day_HadGEM2-ES_historical_r1i1p1_19991201-20051130.nc')
+    ds = Dataset('test_data/cmip5/mrsos_day_HadGEM2-ES_historical_r1i1p1_19991201-20051130.nc')
     assert(check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='hours:1') is False)
 
 
@@ -102,7 +102,7 @@ def test_check_time_format_matches_frequency_test_all_combinations():
         assert(result == expected_result)
 
 def test_check_regular_time_axis_increments_success_1():
-    ds = Dataset('/data/time-checks/mrsos_day_HadGEM2-ES_historical_r1i1p1_19991201-20051130.nc')
+    ds = Dataset('test_data/cmip5/mrsos_day_HadGEM2-ES_historical_r1i1p1_19991201-20051130.nc')
     assert(check_regular_time_axis_increments(ds, frequency_index=1) is True)
 ### NEEDS COVERAGE FOR DIFFERENT CALENDARS
 
