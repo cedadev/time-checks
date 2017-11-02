@@ -24,13 +24,17 @@ The single file tests are:
  - variable_table = "yr": yearly data of the form: yyyy
  - variable_table = "mon": monthly data of the form: yyyyMM
  - variable_table = "monClim": monthly climatology data of the form: yyyyMM
-variable_table = "day": daily data of the form: yyyyMMdd
-variable_table = "6hr": 6 hourly data of the form: yyyyMMddhh
-variable_table = "3hr": 3 hourly data of the form: yyyyMMddhhmm
-variable_table = "subhr": sub-hourly data of the form: yyyyMMddhhmm
+ - variable_table = "day": daily data of the form: yyyyMMdd
+ - variable_table = "6hr": 6 hourly data of the form: yyyyMMddhh
+ - variable_table = "3hr": 3 hourly data of the form: yyyyMMddhhmm
+ - variable_table = "subhr": sub-hourly data of the form: yyyyMMddhhmm
+
 Is the time axis start time consistent with the "start" time as given in the filename (tolerance?)	tolerance 1 timestep	calendar conversion required	Calendars in the CP4CDS CMIP5 data: `julian`, `noleap`, `365_day`, `standard`, `gregorian`, `proleptic_gregorian`, `360_day`.
+
 Is the time axis end time consistent with the "end" as given in the filename (tolerance?)	tolerance 1 timestep	calendar conversion required
 Time axis increments are regular	monthly timeseries 28-31 days
+
+```
 yyyy is an integer greater than [18-29]00	Could just be >0000
 MM is an integer between 01-12
 dd is an integer between 01-31
