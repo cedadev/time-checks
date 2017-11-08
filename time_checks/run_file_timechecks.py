@@ -53,9 +53,21 @@ def test_check_time_format_matches_frequency(w, ds):
         w.writelines(["T1.003: [time_format_matches_frequency]: OK", '\n'])
 
 def test_check_file_name_matches_time_var(w, ds, frequency):
-    tolerance = frequency + ":1"
-    print tolerance
-    if check_file_name_matches_time_var(w, ds, time_index_in_name=-1, tolerance='months:1') == False:
+
+    table = ds['filename'][1]
+    if table in ['Amon', 'Omon', 'Lmon', 'LImon', 'OImon', 'cfMon']:
+        frequency = 'months'
+        limit = 16
+    if table in ['day', 'cfday']:
+        frequency = 'day'
+        limit = 1
+    if table in ['6hrLev', '6hrPlev', '3hr']:
+        frequency = 'hour'
+        limit = 1
+
+    tolerance = frequency +':'+ limit
+
+    if check_file_name_matches_time_var(w, ds, time_index_in_name=-1, tolerance=tolerance) == False:
         w.writelines(["T1.004: [file_name_matches_time_var]: FAILED:: Frequency element in filename does not match time format in file", '\n'])
     else:
         w.writelines(["T1.004: [file_name_matches_time_var]: OK", '\n'])
@@ -89,15 +101,10 @@ if __name__ == "__main__":
             else:
                 w.writelines(["T1.000: [file_extension]: OK \n"])
 
-            table = ifile.split('_')[1]
-            if table in ['Amon', 'Omon', 'Lmon', 'LImon', 'OImon', 'cfMon']: frequency = 'months'
-            if table in ['day', 'cfday']: frequency = 'day'
-            if table in ['6hrLev', '6hrPlev', '3hr']: frequency = 'hour'
-
             ds = Dataset(ncfile)
             test_check_file_name_time_format(w, ds)
             test_check_valid_temporal_element(w, ds)
             test_check_time_format_matches_frequency(w, ds)
-            # test_check_file_name_matches_time_var(w, ds, frequency)
+            # test_check_file_name_matches_time_var(w, ds)
             test_check_regular_time_axis_increments(w, ds)
 

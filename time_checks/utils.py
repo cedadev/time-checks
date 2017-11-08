@@ -501,11 +501,9 @@ def calculate_delta_time_series(times, valid_dt):
     :return: boolean [True for success]
     """
 
-    t = 0
-    while t < len(times) - 1:
-        t_diff = times[t + 1] - times[t]
+    for t in range(len(times)-1):
+        t_diff = times[t+1] - times[t]
         if t_diff not in valid_dt:
             return False
-        else:
-            return True
 
+    return True

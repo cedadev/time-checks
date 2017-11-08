@@ -169,7 +169,7 @@ def check_regular_time_axis_increments(ds, frequency_index=1):
 
     delta_t = [times[1] - times[0]]
 
-    if frequency == 'mon' and calendar in constants.IRREGULAR_MONTHLY_CALENDARS:
+    if frequency in ['Amon', 'Omon', 'Lmon', 'LImon', 'OImon', 'cfMon'] and calendar in constants.IRREGULAR_MONTHLY_CALENDARS:
         result = utils.calculate_delta_time_series(times, constants.VALID_MONTHLY_TIME_DIFFERENCES)
 
     else:
