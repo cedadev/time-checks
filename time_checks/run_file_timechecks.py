@@ -28,6 +28,13 @@ from time_checks.file_time_checks import check_time_format_matches_frequency
 from time_checks.file_time_checks import check_valid_temporal_element
 from time_checks.file_time_checks import check_regular_time_axis_increments
 
+def test_filename_extension(file):
+
+    if not file.endswith('.nc'):
+        return "T1.000: [file_extension]: File does not end with '.nc'"
+        # raise Exception("File does not end with '.nc'. Exiting time checks")
+    else:
+        return "T1.000: [file_extension]: OK"
 
 @resolve_dataset_type
 def test_check_file_name_time_format(ds):
