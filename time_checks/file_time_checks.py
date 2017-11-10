@@ -49,6 +49,8 @@ def check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:
     index `time_index_in_name` when the name is split by "_" and the extension
     removed. The checks are done within the tolerance level specified.
 
+    Note times returned from arrow.get(tm.strftime) must be [<type 'netcdftime._netcdf...'>] objects
+
     :param ds: input dataset [netCDF4 Dataset object (also MockNCDataset) or compliant dictionary]
     :param time_index_in_name: index of time component in the file name [int]
     :param tolerance: tolerance of time difference allowed in match [string]
@@ -60,7 +62,7 @@ def check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:
 
     file_times = [utils._parse_time(comp) for comp in time_comp.split("-")]
     times = num2date([time_var[0], time_var[-1]], ds["time"]["units"], calendar=calendar)
-    t_start, t_end = [arrow.get(tm.strftime()) for tm in times]
+    t_start, t_end = [arrow.get(tm.strftime('%Y-%m-%d %H:%M:%S')) for tm in times]
 
     if not utils._times_match_within_tolerance(t_start, file_times[0], tolerance):
         return False

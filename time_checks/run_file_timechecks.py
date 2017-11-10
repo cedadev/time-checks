@@ -13,6 +13,14 @@ If the output is in False an error message is reported
 4. Check that the temporal elements in the filename match the time range found in the file.
 5. Check that the time axis increments are regularly spaced
 
+Error codes are as follows:
+T1.000: [file_extension]
+T1.001: [check_file_name_time_format]
+T1.002: [check_valid_temporal_element]
+T1.003: [time_format_matches_frequency]
+T1.004: [file_name_matches_time_var]
+T1.005: [regular_time_axis_increments]
+
 """
 import os
 import arrow
@@ -95,16 +103,22 @@ def test_check_regular_time_axis_increments(ds):
         return "T1.005: [regular_time_axis_increments]: OK"
 
 def main(ifile, odir):
+
     """
+    main() calls all the functions within this script
+
     Input arguments are
-    1 - file
+    1 - a NetCDF file with a '.nc' extension
     2 - output directory
-    :return:
+    :return: file with name of input file in the specified output directory
     """
+
+    if not os.path.isdir(odir):
+        os.makedirs(odir)
 
     ncfile = os.path.basename(ifile)
     ofile = os.path.join(odir, ncfile.replace('.nc', '__file_timecheck.log'))
-
+    
     with open(ofile, 'w+') as w:
         w.writelines(["Time checks of: ", ifile, "\n"] )
         ds = Dataset(ifile)
@@ -119,8 +133,6 @@ def main(ifile, odir):
         for test in tests:
             res = test
             w.writelines([res, '\n'])
-
-
 
 if __name__ == '__main__':
 
