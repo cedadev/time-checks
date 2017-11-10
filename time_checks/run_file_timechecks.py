@@ -95,6 +95,12 @@ def test_check_regular_time_axis_increments(ds):
         return "T1.005: [regular_time_axis_increments]: OK"
 
 def main(ifile, odir):
+    """
+    Input arguments are
+    1 - file
+    2 - output directory
+    :return:
+    """
 
     ncfile = os.path.basename(ifile)
     ofile = os.path.join(odir, ncfile.replace('.nc', '__file_timecheck.log'))
@@ -117,13 +123,6 @@ def main(ifile, odir):
 
 
 if __name__ == '__main__':
-
-    """
-    Input arguments are
-    1 - file
-    2 - output directory
-    :return:
-    """
 
     ifile = argv[1]
     odir = argv[2]
