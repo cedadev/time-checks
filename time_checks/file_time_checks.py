@@ -61,8 +61,16 @@ def check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:
     calendar = ds["time"]["calendar"]
 
     file_times = [utils._parse_time(comp) for comp in time_comp.split("-")]
-    times = num2date([time_var[0], time_var[-1]], ds["time"]["units"], calendar=calendar)
-    t_start, t_end = [arrow.get(tm.strftime('%Y-%m-%d %H:%M:%S')) for tm in times]
+    start_time = time_var[0]
+    end_time = time_var[-1]
+    units = ds['time']['units']
+    times = num2date([start_time, end_time], units, calendar=calendar)
+
+    [tm.timetuple() for tm in times]
+    t_start, t_end = [arrow.get("{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(*tm.timetuple()[:6])) for tm in times]
+#    t_start, t_end = [arrow.get(tm.strftime('%Y-%m-%d %H:%M:%S')) for tm in times]
+
+
 
     if not utils._times_match_within_tolerance(t_start, file_times[0], tolerance):
         return False

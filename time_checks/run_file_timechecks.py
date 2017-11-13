@@ -118,7 +118,7 @@ def main(ifile, odir):
 
     ncfile = os.path.basename(ifile)
     ofile = os.path.join(odir, ncfile.replace('.nc', '__file_timecheck.log'))
-    
+
     with open(ofile, 'w+') as w:
         w.writelines(["Time checks of: ", ifile, "\n"] )
         ds = Dataset(ifile)
