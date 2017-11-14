@@ -56,6 +56,7 @@ def check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:
     :param tolerance: tolerance of time difference allowed in match [string]
     :return: boolean [True for success]
     """
+ #   import pdb; pdb.set_trace()
     time_var = ds["time"]["_data"]
     time_comp = ds['filename'][time_index_in_name]
     calendar = ds["time"]["calendar"]
@@ -68,9 +69,7 @@ def check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:
 
     [tm.timetuple() for tm in times]
     t_start, t_end = [arrow.get("{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(*tm.timetuple()[:6])) for tm in times]
-#    t_start, t_end = [arrow.get(tm.strftime('%Y-%m-%d %H:%M:%S')) for tm in times]
-
-
+    #    t_start, t_end = [arrow.get(tm.strftime('%Y-%m-%d %H:%M:%S')) for tm in times]
 
     if not utils._times_match_within_tolerance(t_start, file_times[0], tolerance):
         return False
@@ -176,6 +175,9 @@ def check_regular_time_axis_increments(ds, frequency_index=1):
     frequency = ds['filename'][frequency_index]
     calendar = ds["time"]["calendar"]
     times = ds["time"]["_data"]
+
+    if len(times) == 1:
+        return True
 
     delta_t = [times[1] - times[0]]
 

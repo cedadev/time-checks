@@ -103,36 +103,41 @@ def test_check_regular_time_axis_increments(ds):
         return "T1.005: [regular_time_axis_increments]: OK"
 
 def main(ifile, odir):
-
     """
-    main() calls all the functions within this script
+     main() calls all the functions within this script
 
-    Input arguments are
-    1 - a NetCDF file with a '.nc' extension
-    2 - output directory
-    :return: file with name of input file in the specified output directory
-    """
+     Input arguments are
+     1 - a NetCDF file with a '.nc' extension
+     2 - output directory
+     :return: file with name of input file in the specified output directory
+     """
+    is_file = os.path.isfile(ifile)
 
     if not os.path.isdir(odir):
         os.makedirs(odir)
-
+    print "::::::::::::::::::::::"
+    print ifile
+    if is_file: print "IS VALID CEDA FILE"
     ncfile = os.path.basename(ifile)
     ofile = os.path.join(odir, ncfile.replace('.nc', '__file_timecheck.log'))
 
     with open(ofile, 'w+') as w:
-        w.writelines(["Time checks of: ", ifile, "\n"] )
-        ds = Dataset(ifile)
-        tests = [test_filename_extension(ifile),
-                 test_check_file_name_time_format(ds),
-                 test_check_valid_temporal_element(ds),
-                 test_check_time_format_matches_frequency(ds),
-                 test_check_file_name_matches_time_var(ds),
-                 test_check_regular_time_axis_increments(ds)
-                ]
+        w.writelines(["Time checks of: {} \n".format(ifile)])
+        if not is_file:
+            w.writelines(["FATAL {} does not exist in the CEDA archive \n".format(ifile)])
+        else:
+            ds = Dataset(ifile)
+            tests = [test_filename_extension(ifile),
+                     test_check_file_name_time_format(ds),
+                     test_check_valid_temporal_element(ds),
+                     test_check_time_format_matches_frequency(ds),
+                     test_check_file_name_matches_time_var(ds),
+                     test_check_regular_time_axis_increments(ds)
+                     ]
+            for test in tests:
+                res = test
+                w.writelines([res, '\n'])
 
-        for test in tests:
-            res = test
-            w.writelines([res, '\n'])
 
 if __name__ == '__main__':
 

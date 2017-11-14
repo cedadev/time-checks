@@ -198,6 +198,9 @@ def _times_match_within_tolerance(t1, t2, tolerance="days:1"):
     Compares two datetime arrow objects and returns True if they match
     within the time period specified in `tolerance`.
 
+    Usually t1 is the start time as taken from the file
+    Usually t2 is the start time as given by the filename
+
     :param t1: datetime [arrow object]
     :param t2: datetime [arrow object]
     :param tolerance: tolerance period [string]
@@ -209,6 +212,17 @@ def _times_match_within_tolerance(t1, t2, tolerance="days:1"):
 
     if t1 == t2:
         return True
+
+    """
+    If time series starts on 01-01-0001 then subtracting the timedelta causes error as time goes BC 
+    Arrow only supprts AD times, therefore only check that the time in the filename is less than
+    time in the file with the given tolerance.
+    """
+    close_to_zero_ad = arrow.get(0001, 01, 17)
+    if t2 < close_to_zero_ad:
+        if t2 < (t1 + delta):
+            return True
+
     if (t1 - delta) < t2 < (t1 + delta):
         return True
 

@@ -40,6 +40,7 @@ def test_check_file_name_time_format_success_1():
         mock_ds = MockNCDataset(fname)
         assert(check_file_name_time_format(mock_ds) is True)
 
+
 def test_check_file_name_matches_time_var_success_1():
 
     files = ['test_data/cmip5/mrsos_day_HadGEM2-ES_historical_r1i1p1_19991201-20051130.nc',
@@ -50,11 +51,19 @@ def test_check_file_name_matches_time_var_success_1():
         ds = Dataset(f)
         assert(check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:16') is True)
 
+def test_check_file_name_matches_time_var_success_2():
+    ds = Dataset('test_data/cmip5/tas_Amon_CCSM4_piControl_r3i1p1_000101-012012.nc')
+    assert(check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:16') is True)
+
 
 def test_check_file_name_matches_time_var_fail_1():
     ds = Dataset('test_data/cmip5/mrsos_day_HadGEM2-ES_historical_r1i1p1_19991201-20051130.nc')
-    assert(check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='hours:1') is False)
+    assert(check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:16') is False)
 
+
+def test_check_file_name_matches_time_var_fail_2():
+    ds = Dataset('test_data/cmip5/tas_Amon_CCSM4_piControl_r3i1p1_000101-012012.nc')
+    assert(check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='hours:1') is False)
 
 def test_check_time_format_matches_frequency_success_1():
 
@@ -107,8 +116,15 @@ def test_check_time_format_matches_frequency_test_all_combinations():
         assert(result == expected_result)
 
 def test_check_regular_time_axis_increments_success_1():
-    ds = Dataset('test_data/cmip5/mrsos_day_HadGEM2-ES_historical_r1i1p1_19991201-20051130.nc')
-    assert(check_regular_time_axis_increments(ds, frequency_index=1) is True)
+
+    files = ['test_data/cmip5/mrsos_day_HadGEM2-ES_historical_r1i1p1_19991201-20051130.nc',
+             'test_data/cmip5/tasmax_Amon_HadGEM2-ES_historical_r2i1p1_185912-185912.nc',
+             'test_data/cmip5/zg_Amon_EC-EARTH_historical_r1i1p1_195101-195101.nc'
+             ]
+
+    for f in files:
+        ds = Dataset(f)
+        assert(check_regular_time_axis_increments(ds, frequency_index=1) is True)
 
 
 def test_check_regular_time_axis_increments_fail_1():
