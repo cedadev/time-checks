@@ -58,8 +58,7 @@ def check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:
     :return: boolean [True for success]
     """
     return_msg = ""
-    
-    import pdb; pdb.set_trace()
+
     time_var = ds["time"]["_data"]
     time_comp = ds['filename'][time_index_in_name]
     calendar = ds["time"]["calendar"]
