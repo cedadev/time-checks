@@ -206,12 +206,13 @@ def _times_match_within_tolerance(t1, t2, tolerance="days:1"):
     :param tolerance: tolerance period [string]
     :return: boolean [True for success]
     """
+    return_msg = ""
     unit = tolerance.split(":")[0]
     n = float(tolerance.split(":")[1])
     delta = timedelta(**{unit: n})
 
     if t1 == t2:
-        return True
+        return True, return_msg
 
     """
     If time series starts on 01-01-0001 then subtracting the timedelta causes error as time goes BC 
@@ -221,12 +222,12 @@ def _times_match_within_tolerance(t1, t2, tolerance="days:1"):
     close_to_zero_ad = arrow.get(0001, 01, 17)
     if t2 < close_to_zero_ad:
         if t2 < (t1 + delta):
-            return True
+            return True, return_msg
 
     if (t1 - delta) < t2 < (t1 + delta):
-        return True
+        return True, return_msg
 
-    return False
+    return False, return_msg
 
 
 class DateTimeAnyTime(object):
@@ -514,10 +515,10 @@ def calculate_delta_time_series(times, valid_dt):
     :param valid_dt: Valid time difference, usually scalar, list of valid times supported
     :return: boolean [True for success]
     """
-
+    return_msg = ""
     for t in range(len(times)-1):
         t_diff = times[t+1] - times[t]
         if t_diff not in valid_dt:
-            return False
+            return False, return_msg
 
-    return True
+    return True, return_msg

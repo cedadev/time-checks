@@ -30,13 +30,14 @@ def check_file_name_time_format(ds, time_index_in_name=-1):
     :param time_index_in_name: index of time component in the file name [int]
     :return: boolean (True for success).
     """
+    return_msg = ""
     time_comp = ds['filename'][time_index_in_name]
 
     for regex in constants.FILE_NAME_REGEXES:
         if regex.match(time_comp):
-            return True
+            return True, return_msg
 
-    return False
+    return False, return_msg
 
 
 @resolve_dataset_type
@@ -56,7 +57,9 @@ def check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:
     :param tolerance: tolerance of time difference allowed in match [string]
     :return: boolean [True for success]
     """
- #   import pdb; pdb.set_trace()
+    return_msg = ""
+    
+    import pdb; pdb.set_trace()
     time_var = ds["time"]["_data"]
     time_comp = ds['filename'][time_index_in_name]
     calendar = ds["time"]["calendar"]
@@ -65,19 +68,24 @@ def check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:
     start_time = time_var[0]
     end_time = time_var[-1]
     units = ds['time']['units']
+    if len(units.strip("days since ")) == 7:
+        return False, "Format of units is incorrect, it is of the form 'days since YYYY-MM'," \
+                      " it should be of the form 'YYYY-MM-DD'"
     times = num2date([start_time, end_time], units, calendar=calendar)
 
     [tm.timetuple() for tm in times]
     t_start, t_end = [arrow.get("{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(*tm.timetuple()[:6])) for tm in times]
     #    t_start, t_end = [arrow.get(tm.strftime('%Y-%m-%d %H:%M:%S')) for tm in times]
 
-    if not utils._times_match_within_tolerance(t_start, file_times[0], tolerance):
-        return False
+    result, return_msg = utils._times_match_within_tolerance(t_start, file_times[0], tolerance)
+    if result == False:
+        return False, return_msg
 
-    if not utils._times_match_within_tolerance(t_end, file_times[1], tolerance):
-        return False
+    result, return_msg = utils._times_match_within_tolerance(t_end, file_times[1], tolerance)
+    if result == False:
+        return False, return_msg
 
-    return True
+    return True, return_msg
 
 
 @resolve_dataset_type
@@ -101,13 +109,14 @@ def check_time_format_matches_frequency(ds, frequency_index=1, time_index_in_nam
     :param ds: input dataset [netCDF4 Dataset object (also MockNCDataset) or compliant dictionary]
     :return: boolean [True for success]
     """
+    return_msg = ""
     time_comp = ds['filename'][time_index_in_name]
     frequency = ds['filename'][frequency_index]
 
     if len(time_comp.split('-')[0]) == constants.CMOR_TABLES_FORMAT[frequency]:
-        return True
+        return True, return_msg
 
-    return False
+    return False, return_msg
 
 
 @resolve_dataset_type
@@ -125,6 +134,7 @@ def check_valid_temporal_element(ds, time_index_in_name=-1):
     :param time_index_in_name: index of time component in the file name [int]
     :return: boolean [True for success]
     """
+    return_msg = ""
     time_comp = ds['filename'][time_index_in_name]
 
     for time_element in time_comp.split('-'):
@@ -140,19 +150,19 @@ def check_valid_temporal_element(ds, time_index_in_name=-1):
                         if length_time >= 12:
                             mn = int(time_element[10:12])
 
-        if yyyy > 4000 or yyyy < 0000: return False
+        if yyyy > 4000 or yyyy < 0000: return False, return_msg
 
         if 'mm' in locals():
-            if mm > 12 or mm < 01: return False
+            if mm > 12 or mm < 01: return False, return_msg
         if 'dd' in locals():
-            if dd > 31 or dd < 01: return False
+            if dd > 31 or dd < 01: return False, return_msg
             # does not account for calendars where 31 may be invalid for a 360 day calendar
         if 'hh' in locals():
-            if hh > 23 or hh < 00: return False
+            if hh > 23 or hh < 00: return False, return_msg
         if 'mn' in locals():
-            if mn > 59 or mn < 00: return False
+            if mn > 59 or mn < 00: return False, return_msg
 
-    return True
+    return True, return_msg
 
 
 @resolve_dataset_type
@@ -172,19 +182,20 @@ def check_regular_time_axis_increments(ds, frequency_index=1):
                             (actually the cmor table, frequency must be implied from this) [int]
     :return: boolean [True for success]
     """
+    return_msg = ""
     frequency = ds['filename'][frequency_index]
     calendar = ds["time"]["calendar"]
     times = ds["time"]["_data"]
 
     if len(times) == 1:
-        return True
+        return True, return_msg
 
     delta_t = [times[1] - times[0]]
 
     if frequency in ['Amon', 'Omon', 'Lmon', 'LImon', 'OImon', 'cfMon'] and calendar in constants.IRREGULAR_MONTHLY_CALENDARS:
-        result = utils.calculate_delta_time_series(times, constants.VALID_MONTHLY_TIME_DIFFERENCES)
+        result, return_msg = utils.calculate_delta_time_series(times, constants.VALID_MONTHLY_TIME_DIFFERENCES)
 
     else:
-        result = utils.calculate_delta_time_series(times, delta_t)
+        result, return_msg = utils.calculate_delta_time_series(times, delta_t)
 
-    return result
+    return result, return_msg

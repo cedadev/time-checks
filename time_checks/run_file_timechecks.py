@@ -46,9 +46,9 @@ def test_filename_extension(file):
 
 @resolve_dataset_type
 def test_check_file_name_time_format(ds):
-
-    if check_file_name_time_format(ds) == False:
-        return "T1.001: [check_file_name_time_format]: FAILED:: Format of file name is not recognised"
+    res, msg = check_file_name_time_format(ds)
+    if res == False:
+        return "T1.001: [check_file_name_time_format]: FAILED:: Format of file name is not recognised. " + msg
     else:
        return "T1.001: [check_file_name_time_format]: OK"
 
@@ -56,8 +56,9 @@ def test_check_file_name_time_format(ds):
 @resolve_dataset_type
 def test_check_valid_temporal_element(ds):
 
-    if check_valid_temporal_element(ds, time_index_in_name=-1) == False:
-        return "T1.002: [check_valid_temporal_element]: FAILED:: Temporal elements are not valid"
+    res, msg = check_valid_temporal_element(ds, time_index_in_name=-1)
+    if res == False:
+        return "T1.002: [check_valid_temporal_element]: FAILED:: Temporal elements are not valid. " + msg
     else:
        return "T1.002: [check_valid_temporal_element]: OK"
 
@@ -65,8 +66,10 @@ def test_check_valid_temporal_element(ds):
 @resolve_dataset_type
 def test_check_time_format_matches_frequency(ds):
 
-    if check_time_format_matches_frequency(ds, frequency_index=1, time_index_in_name=-1) == False:
-        return "T1.003: [time_format_matches_frequency]: FAILED:: Frequency element in filename does not match time format in file"
+    res, msg = check_time_format_matches_frequency(ds, frequency_index=1, time_index_in_name=-1)
+    if res == False:
+        return "T1.003: [time_format_matches_frequency]: FAILED:: " \
+               "Frequency element in filename does not match time format in file. " + msg
     else:
         return "T1.003: [time_format_matches_frequency]: OK"
 
@@ -88,17 +91,19 @@ def test_check_file_name_matches_time_var(ds):
 
     tolerance = "{}:{}".format(frequency, limit)
 
-    if check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance=tolerance) == False:
-        return "T1.004: [file_name_matches_time_var]: FAILED:: Frequency element in filename does not match time format in file"
+    res, mes = check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance=tolerance)
+    if res == False:
+        return "T1.004: [file_name_matches_time_var]: FAILED:: " \
+               "Frequency element in filename does not match time format in file. " + msg
     else:
         return "T1.004: [file_name_matches_time_var]: OK"
 
 
 @resolve_dataset_type
 def test_check_regular_time_axis_increments(ds):
-
-    if check_regular_time_axis_increments(ds, frequency_index=1) == False:
-        return "T1.005: [regular_time_axis_increments]: FAILED:: Time axis increments are not regular"
+    res, msg = check_regular_time_axis_increments(ds, frequency_index=1)
+    if res == False:
+        return "T1.005: [regular_time_axis_increments]: FAILED:: Time axis increments are not regular. " + msg
     else:
         return "T1.005: [regular_time_axis_increments]: OK"
 
@@ -115,9 +120,7 @@ def main(ifile, odir):
 
     if not os.path.isdir(odir):
         os.makedirs(odir)
-    print "::::::::::::::::::::::"
-    print ifile
-    if is_file: print "IS VALID CEDA FILE"
+
     ncfile = os.path.basename(ifile)
     ofile = os.path.join(odir, ncfile.replace('.nc', '__file_timecheck.log'))
 
