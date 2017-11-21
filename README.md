@@ -18,21 +18,22 @@ The full list of checks managed by this package are provided below:
 
 The single file tests are:
 
-- check_file_name_time_format
+- `check_file_name_time_format`
   
   Checks that the format of the file name contains two components in the form "start"-"end", separated by "-"
   Checks that the time components matches known regular expressions of the form YYYY[mm[DD[HH[MM]]]] and the "start" 
   and "end" times must have the same the structure.
 
   Where [] indicated the elements are optional and
-  YYYY: is a four digit integer year
-  mm: is a two digit integer month
-  DD: is a two digit integer day
-  HH: is a two digit integer hour
-  MM: is a two digit integer minute
+  
+  * YYYY: is a four digit integer year
+  * mm: is a two digit integer month
+  * DD: is a two digit integer day
+  * HH: is a two digit integer hour
+  * MM: is a two digit integer minute
 
 
-- check_file_name_matches_time_var
+- `check_file_name_matches_time_var`
 
   Checks that the file name of a dataset (file) matches the time range
   found in the file. The time component in the file name is extracted at
@@ -45,29 +46,30 @@ The single file tests are:
   specified for this check.    
 
 
-- check_time_format_matches_frequency
+- `check_time_format_matches_frequency`
 
   Checks for consistenty between the time frequency and the format of the time.
-  cmor_table = "yr", "Oyr": yearly data of the form: yyyy, test has length 4
-  cmor_table = "Amon", "Lmon", "Omon", "LImon", "OImon", "cfMon": monthly data of the form: yyyyMM, test has length 6
-  cmor_table = "monClim": monthly climatology data of the form: yyyyMM, test has length 6
-  cmor_table = "day", "cfDay": daily data of the form: yyyyMMdd, test has length 8
-  cmor_table = "6hrLev", "6hrPLev": 6 hourly data of the form: yyyyMMddhh, test has length 10
-  cmor_table = "3hr", "": 3 hourly data of the form: yyyyMMddhhmm, test has length 12
-  cmor_table = "subhr": sub-hourly data of the form: yyyyMMddhhmm, test has length 12
-  NOT IMPLEMENTED YET: 'aero': 0,'cfOff': 0, 'cfSites': 0, 'fx': 0
+  * cmor_table = "yr", "Oyr": yearly data of the form: yyyy, test has length 4
+  * cmor_table = "Amon", "Lmon", "Omon", "LImon", "OImon", "cfMon": monthly data of the form: yyyyMM, test has length 6
+  * cmor_table = "monClim": monthly climatology data of the form: yyyyMM, test has length 6
+  * cmor_table = "day", "cfDay": daily data of the form: yyyyMMdd, test has length 8
+  * cmor_table = "6hrLev", "6hrPLev": 6 hourly data of the form: yyyyMMddhh, test has length 10
+  * cmor_table = "3hr", "": 3 hourly data of the form: yyyyMMddhhmm, test has length 12
+  * cmor_table = "subhr": sub-hourly data of the form: yyyyMMddhhmm, test has length 12
+  * NOT IMPLEMENTED YET: 'aero': 0,'cfOff': 0, 'cfSites': 0, 'fx': 0
     
 
-- check_valid_temporal_element
+- `check_valid_temporal_element`
   
   Checks whether the temporal elements are within the valid ranges:
-  years, yyyy: a four digit integer > 0000 
-  months, MM: a two digit integer between 01 and 12
-  days, dd: a two digit integer between 01-31
-  hours, hh: a two digit integer between 00-23
-  minutes, mm: a two digit integer between 00-59
+  
+  * years, yyyy: a four digit integer > 0000 
+  * months, MM: a two digit integer between 01 and 12
+  * days, dd: a two digit integer between 01-31
+  * hours, hh: a two digit integer between 00-23
+  * minutes, mm: a two digit integer between 00-59
     
- - check_regular_time_axis_increments
+- `check_regular_time_axis_increments`
   
    Checks that the given time axis increments for a given file are regularly spaced throughout the time series.
    Since it is common to have the timestamp of monthly data placed at the middle of month,
@@ -89,12 +91,12 @@ calls the time checks in given order.
 5. Check that the time axis increments are regularly spaced
 
 Error codes are as follows:
-T1.000: [file_extension]
-T1.001: [check_file_name_time_format]
-T1.002: [check_valid_temporal_element]
-T1.003: [time_format_matches_frequency]
-T1.004: [file_name_matches_time_var]
-T1.005: [regular_time_axis_increments]
+* T1.000: [file_extension]
+* T1.001: [check_file_name_time_format]
+* T1.002: [check_valid_temporal_element]
+* T1.003: [time_format_matches_frequency]
+* T1.004: [file_name_matches_time_var]
+* T1.005: [regular_time_axis_increments]
 
 ### Aggregation over multi-file timeseries data
 
