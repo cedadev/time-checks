@@ -33,6 +33,7 @@ The single file tests are:
 
 
 - check_file_name_matches_time_var
+
   Checks that the file name of a dataset (file) matches the time range
   found in the file. The time component in the file name is extracted at
   index The checks are done within the tolerance level specified.
@@ -45,32 +46,35 @@ The single file tests are:
 
 
 - check_time_format_matches_frequency
-    Checks for consistenty between the time frequency and the format of the time.
-    cmor_table = "yr", "Oyr": yearly data of the form: yyyy, test has length 4
-    cmor_table = "Amon", "Lmon", "Omon", "LImon", "OImon", "cfMon": monthly data of the form: yyyyMM, test has length 6
-    cmor_table = "monClim": monthly climatology data of the form: yyyyMM, test has length 6
-    cmor_table = "day", "cfDay": daily data of the form: yyyyMMdd, test has length 8
-    cmor_table = "6hrLev", "6hrPLev": 6 hourly data of the form: yyyyMMddhh, test has length 10
-    cmor_table = "3hr", "": 3 hourly data of the form: yyyyMMddhhmm, test has length 12
-    cmor_table = "subhr": sub-hourly data of the form: yyyyMMddhhmm, test has length 12
-    NOT IMPLEMENTED YET: 'aero': 0,'cfOff': 0, 'cfSites': 0, 'fx': 0
+
+  Checks for consistenty between the time frequency and the format of the time.
+  cmor_table = "yr", "Oyr": yearly data of the form: yyyy, test has length 4
+  cmor_table = "Amon", "Lmon", "Omon", "LImon", "OImon", "cfMon": monthly data of the form: yyyyMM, test has length 6
+  cmor_table = "monClim": monthly climatology data of the form: yyyyMM, test has length 6
+  cmor_table = "day", "cfDay": daily data of the form: yyyyMMdd, test has length 8
+  cmor_table = "6hrLev", "6hrPLev": 6 hourly data of the form: yyyyMMddhh, test has length 10
+  cmor_table = "3hr", "": 3 hourly data of the form: yyyyMMddhhmm, test has length 12
+  cmor_table = "subhr": sub-hourly data of the form: yyyyMMddhhmm, test has length 12
+  NOT IMPLEMENTED YET: 'aero': 0,'cfOff': 0, 'cfSites': 0, 'fx': 0
     
 
 - check_valid_temporal_element
-    Checks whether the temporal elements are within the valid ranges:
-    years, yyyy: a four digit integer > 0000 
-    months, MM: a two digit integer between 01 and 12
-    days, dd: a two digit integer between 01-31
-    hours, hh: a two digit integer between 00-23
-    minutes, mm: a two digit integer between 00-59
+  
+  Checks whether the temporal elements are within the valid ranges:
+  years, yyyy: a four digit integer > 0000 
+  months, MM: a two digit integer between 01 and 12
+  days, dd: a two digit integer between 01-31
+  hours, hh: a two digit integer between 00-23
+  minutes, mm: a two digit integer between 00-59
     
  - check_regular_time_axis_increments
-    Checks that the given time axis increments for a given file are regularly spaced throughout the time series.
-    Since it is common to have the timestamp of monthly data placed at the middle of month,
-    monthly CMIP5 maybe irregularly spaced when using any of the following calendars:
-        'gregorian', 'proleptic_gregorian', 'julian', 'noleap', '365_day', 'standard',
-    For these calendars valid time axis increments are 29.5, 30.5 and 31 days.
-    For most other frequencies in CMIP5 the time increments should be regular.
+  
+   Checks that the given time axis increments for a given file are regularly spaced throughout the time series.
+   Since it is common to have the timestamp of monthly data placed at the middle of month,
+   monthly CMIP5 maybe irregularly spaced when using any of the following calendars:
+   'gregorian', 'proleptic_gregorian', 'julian', 'noleap', '365_day', 'standard',
+   For these calendars valid time axis increments are 29.5, 30.5 and 31 days.
+   For most other frequencies in CMIP5 the time increments should be regular.
 
 
 ### Running the time checks on your data using run_file_timechecks.py
