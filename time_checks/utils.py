@@ -222,6 +222,7 @@ def _times_match_within_tolerance(t1, t2, tolerance="days:1"):
     close_to_zero_ad = arrow.get(0001, 01, 17)
     if t2 < close_to_zero_ad:
         if t2 < (t1 + delta):
+            return_msg = "Time close to zero"
             return True, return_msg
 
     if (t1 - delta) < t2 < (t1 + delta):
@@ -519,6 +520,7 @@ def calculate_delta_time_series(times, valid_dt):
     for t in range(len(times)-1):
         t_diff = times[t+1] - times[t]
         if t_diff not in valid_dt:
+            return_msg = "Time difference {} is irregular or not in allowed values {}".format(t_diff, valid_dt)
             return False, return_msg
 
     return True, return_msg
