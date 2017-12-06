@@ -69,7 +69,7 @@ def test_check_time_format_matches_frequency(ds):
     res, msg = check_time_format_matches_frequency(ds, frequency_index=1, time_index_in_name=-1)
     if res == False:
         return "T1.003: [time_format_matches_frequency]: FAILED:: " \
-               "Frequency element in filename does not match time format in file. " + msg
+               "Frequency element of the filename does not match frequency of data in the file. " + msg
     else:
         return "T1.003: [time_format_matches_frequency]: OK"
 
@@ -91,10 +91,10 @@ def test_check_file_name_matches_time_var(ds):
 
     tolerance = "{}:{}".format(frequency, limit)
 
-    res, mes = check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance=tolerance)
+    res, msg = check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance=tolerance)
     if res == False:
         return "T1.004: [file_name_matches_time_var]: FAILED:: " \
-               "Frequency element in filename does not match time format in file. " + msg
+               "Frequency element of the filename does not match time format in file. " + msg
     else:
         return "T1.004: [file_name_matches_time_var]: OK"
 

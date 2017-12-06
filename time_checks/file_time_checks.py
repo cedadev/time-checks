@@ -181,12 +181,14 @@ def check_regular_time_axis_increments(ds, frequency_index=1):
                             (actually the cmor table, frequency must be implied from this) [int]
     :return: boolean [True for success]
     """
+
     return_msg = ""
     frequency = ds['filename'][frequency_index]
     calendar = ds["time"]["calendar"]
     times = ds["time"]["_data"]
 
     if len(times) == 1:
+        return_msg = "Only one time-step"
         return True, return_msg
 
     delta_t = [times[1] - times[0]]

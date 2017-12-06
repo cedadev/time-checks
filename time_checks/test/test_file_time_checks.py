@@ -129,13 +129,13 @@ def test_check_regular_time_axis_increments_success_1():
 
     files = ['test_data/cmip5/mrsos_day_HadGEM2-ES_historical_r1i1p1_19991201-20051130.nc',
              'test_data/cmip5/tasmax_Amon_HadGEM2-ES_historical_r2i1p1_185912-185912.nc',
-             'test_data/cmip5/zg_Amon_EC-EARTH_historical_r1i1p1_195101-195101.nc'
+             'test_data/cmip5/zg_Amon_EC-EARTH_historical_r1i1p1_195101-195101.nc',
+             'test_data/cmip5/hur_Amon_ACCESS1-0_rcp45_r1i1p1_200601-205512.nc',
              ]
 
     for f in files:
         ds = Dataset(f)
         assert(check_regular_time_axis_increments(ds, frequency_index=1)[0] is True)
-
 
 def test_check_regular_time_axis_increments_fail_1():
     files = ['test_data/cmip5/mrsos_day_HadGEM2-ES_historical_r2i1p1_19991201-20051130.nc',]
