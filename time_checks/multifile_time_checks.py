@@ -27,6 +27,9 @@ def check_multifile_temporal_continuity(dss, time_index_in_name=-1, frequency_in
     :param frequency_index: index of the frequency component in the file names
     :return: Boolean (Success or Failure)
     """
+
+    err_msg = ""
+
     # Sort the datasets by file name just in case files have been provided in a strange order
     dss_by_name = [(ds['filename'], ds) for ds in dss]
     dss_by_name.sort()
@@ -57,7 +60,7 @@ def check_multifile_temporal_continuity(dss, time_index_in_name=-1, frequency_in
 
         # If file series is longer than remaining full series then fail
         if len(f_series) > len(series):
-            return False
+            return False, err_msg
 
         # Loop through series: removing from both full series and file series
         #  when both are equal
@@ -70,9 +73,9 @@ def check_multifile_temporal_continuity(dss, time_index_in_name=-1, frequency_in
                 f_series.remove(dt)
                 series.remove(dt)
             else:
-                return False
+                return False, err_msg
 
     # Check if series still contains values: if so return False
-    if series: return False
+    if series: return False, err_msg
 
-    return True
+    return True, err_msg

@@ -35,17 +35,17 @@ def _call_common_multifile_check(file_list):
         print fpath
         datasets.append(Dataset(fpath))
 
-    result = check_multifile_temporal_continuity(datasets, time_index_in_name=-1)
+    result = check_multifile_temporal_continuity(datasets, time_index_in_name=-1)[0]
     return result
 
 
 def test_check_multifile_temporal_continuity_monthly_success_1():
     file_names = ['tas_Amon_HadGEM2-ES_historical_r1i1p1_185912-188411.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_188412-190911.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_190912-193411.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_193412-195911.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_195912-198411.nc',
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_198412-200511.nc']
+                  'tas_Amon_HadGEM2-ES_historical_r1i1p1_188412-190911.nc',
+                  'tas_Amon_HadGEM2-ES_historical_r1i1p1_190912-193411.nc',
+                  'tas_Amon_HadGEM2-ES_historical_r1i1p1_193412-195911.nc',
+                  'tas_Amon_HadGEM2-ES_historical_r1i1p1_195912-198411.nc',
+                  'tas_Amon_HadGEM2-ES_historical_r1i1p1_198412-200511.nc']
 
     result = _call_common_multifile_check(file_names)
     assert(result is True)
@@ -53,8 +53,8 @@ def test_check_multifile_temporal_continuity_monthly_success_1():
 
 def test_check_multifile_temporal_continuity_monthly_fail_1():
     file_names = ['tas_Amon_HadGEM2-ES_historical_r1i1p1_185912-188411.nc',
-                     # Missing files here
-                     'tas_Amon_HadGEM2-ES_historical_r1i1p1_198412-200511.nc']
+                  # Missing files here
+                  'tas_Amon_HadGEM2-ES_historical_r1i1p1_198412-200511.nc']
 
     result = _call_common_multifile_check(file_names)
     assert(result is False)
@@ -62,11 +62,11 @@ def test_check_multifile_temporal_continuity_monthly_fail_1():
 
 def test_check_multifile_temporal_continuity_day_success_1():
     file_names = ['ua_day_IPSL-CM5A-LR_historical_r1i1p1_19500101-19591231.nc',
-                     'ua_day_IPSL-CM5A-LR_historical_r1i1p1_19600101-19691231.nc',
-                     'ua_day_IPSL-CM5A-LR_historical_r1i1p1_19700101-19791231.nc',
-                     'ua_day_IPSL-CM5A-LR_historical_r1i1p1_19800101-19891231.nc',
-                     'ua_day_IPSL-CM5A-LR_historical_r1i1p1_19900101-19991231.nc',
-                     'ua_day_IPSL-CM5A-LR_historical_r1i1p1_20000101-20051231.nc']
+                  'ua_day_IPSL-CM5A-LR_historical_r1i1p1_19600101-19691231.nc',
+                  'ua_day_IPSL-CM5A-LR_historical_r1i1p1_19700101-19791231.nc',
+                  'ua_day_IPSL-CM5A-LR_historical_r1i1p1_19800101-19891231.nc',
+                  'ua_day_IPSL-CM5A-LR_historical_r1i1p1_19900101-19991231.nc',
+                  'ua_day_IPSL-CM5A-LR_historical_r1i1p1_20000101-20051231.nc']
 
     result = _call_common_multifile_check(file_names)
     assert(result is True)
