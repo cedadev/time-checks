@@ -77,17 +77,17 @@ def test_check_time_format_matches_frequency(ds):
 @resolve_dataset_type
 def test_check_file_name_matches_time_var(ds):
 
-
     table = ds["filename"][1]
-    if table in ['Amon', 'Omon', 'Lmon', 'LImon', 'OImon', 'cfMon']:
+    if table in ['Amon', 'Omon', 'Lmon', 'LImon', 'OImon', 'cfMon', 'aero']:
         frequency = 'days'
         limit = 16
     if table in ['day', 'cfday']:
         frequency = 'days'
         limit = 1
-    if table in ['6hrLev', '6hrPlev', '3hr']:
+    if table in ['6hrLev', '6hrPlev', '3hr', 'cf3hr']:
         frequency = 'hours'
         limit = 1
+
 
     tolerance = "{}:{}".format(frequency, limit)
 
