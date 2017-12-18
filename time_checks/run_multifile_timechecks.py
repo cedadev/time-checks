@@ -28,3 +28,7 @@ def test_check_multifile_temporal_continuity(listoffiles):
     else:
        return "T1.006: [check_multifile_temporal_continuity]: OK"
 
+if __name__ == '__main__':
+
+    files = argv[1:]
+    test_check_multifile_temporal_continuity(files)

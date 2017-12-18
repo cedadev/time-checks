@@ -60,6 +60,7 @@ def check_multifile_temporal_continuity(dss, time_index_in_name=-1, frequency_in
 
         # If file series is longer than remaining full series then fail
         if len(f_series) > len(series):
+            err_msg = "File is out of series range"
             return False, err_msg
 
         # Loop through series: removing from both full series and file series
@@ -73,9 +74,12 @@ def check_multifile_temporal_continuity(dss, time_index_in_name=-1, frequency_in
                 f_series.remove(dt)
                 series.remove(dt)
             else:
+                err_msg = "File not in series"
                 return False, err_msg
 
     # Check if series still contains values: if so return False
-    if series: return False, err_msg
+    if series:
+        err_msg = "Temporal consistency error"
+        return False, err_msg
 
     return True, err_msg
