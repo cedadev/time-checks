@@ -24,20 +24,76 @@ from time_checks.multifile_time_checks import check_multifile_temporal_continuit
 
 
 @resolve_dataset_type
-def test_check_multifile_temporal_continuity(listoffiles):
-    res, msg = check_multifile_temporal_continuity(listoffiles)
+def test_check_multifile_temporal_continuity(files):
+
+    res, msg = check_multifile_temporal_continuity(files)
 
     if res == False:
-        return "[check_multifile_temporal_continuity]: FAILED::" + msg
+        return "T1.006: [check_multifile_temporal_continuity]: FAILED:: " + msg
     else:
-        return "[check_multifile_temporal_continuity]: OK"
+        return "T1.006: [check_multifile_temporal_continuity]: OK"
+
+
+
+def is_part_of_timeseries(ifile):
+    
+    msg = ""
+    if os.path.isdir(os.path.dirname(ifile)):
+
+        if len(os.listdir(os.path.dirname(ifile))) > 1:
+            ts = True
+        else:
+            ts = False
+            msg = "Single file in timeseries or fx"
+    else:
+        ts = False
+        msg = "Path error"
+        
+    return ts, msg
+
+def main(ifiles, odir='.'):
+
+    ifiles = [ifiles]
+    import pdb
+
+
+    if len(ifiles) == 1:
+        fname = ifiles[0]
+        ts, msg = is_part_of_timeseries(fname)
+        if not ts:   
+            return "T1.006: [check_multifile_temporal_continuity]: " + msg
+        else:
+            dirname = os.path.dirname(fname)
+            fnames = os.listdir(dirname)
+            filenames = []
+            for f in fnames:
+                filenames.append(os.path.join(dirname, f))
+
+    else :
+        filenames = ifiles
+
+    files = []
+    for f in filenames:
+        files.append(Dataset(f))
+
+    res = test_check_multifile_temporal_continuity(files)
+    pdb.set_trace()
+    for f in filenames:
+        institute, model, experiment, frequency, realm, table, ensemble, version, variable, ncfile = f.split('/')[6:]
+        logfile = os.path.join(odir, ncfile.replace('.nc', '__file_timecheck.log'))
+
+        if os.path.isfile(logfile):
+            with open(logfile, 'a') as w:
+                w.writelines([res, '\n'])
+
+        else:
+            if not os.path.isdir(odir):
+                os.makedirs(odir)
+            with open(logfile, 'w+') as w:
+                w.writelines([res, '\n'])
 
 
 if __name__ == '__main__':
 
-    args = argv[1:]
-    files = []
-    for f in args:
-        files.append(Dataset(f))
-    msg = test_check_multifile_temporal_continuity(files)
-    print msg
+    ifiles = argv[1:]
+    main(ifiles, odir)

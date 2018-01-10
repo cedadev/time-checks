@@ -60,7 +60,7 @@ def test_check_valid_temporal_element(ds):
     if res == False:
         return "T1.002: [check_valid_temporal_element]: FAILED:: Temporal elements are not valid. " + msg
     else:
-       return "T1.002: [check_valid_temporal_element]: OK"
+        return "T1.002: [check_valid_temporal_element]: OK"
 
 
 @resolve_dataset_type
