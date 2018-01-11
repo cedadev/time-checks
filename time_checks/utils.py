@@ -59,6 +59,8 @@ def resolve_dataset_type(func):
         # Loop through all and convert them
         converted_datasets = []
 
+        import pdb; pdb.set_trace()
+
         for ds in datasets:
             if isinstance(ds, Dataset):
                 ds = _convert_dataset_to_dict(ds)
