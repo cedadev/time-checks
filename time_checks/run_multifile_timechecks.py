@@ -64,7 +64,7 @@ def write_results(filenames, res, odir):
     for f in filenames:
         institute, model, experiment, frequency, realm, table, ensemble, version, variable, ncfile = f.split('/')[6:]
         logfile = os.path.join(odir, ncfile.replace('.nc', '__file_timecheck.log'))
-        print logfile
+        
         if os.path.isfile(logfile):
             with open(logfile, 'a') as w:
                 w.writelines([res, '\n'])
@@ -114,5 +114,5 @@ def main(ifiles, odir):
 if __name__ == '__main__':
 
     ifiles = argv[1:]
-    odir = "/home/users/rpetrie/cp4cds/time-checks/time_checks/"
+    odir = "./"
     main(ifiles, odir)
