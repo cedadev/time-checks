@@ -40,7 +40,7 @@ def test_check_multifile_temporal_continuity(files):
 
 
 def is_part_of_timeseries(ifile):
-    
+
     msg = ""
     if os.path.isdir(os.path.dirname(ifile)):
 
@@ -77,8 +77,10 @@ def write_results(filenames, res, odir):
 
 def main(ifiles, odir):
 
-    ifiles = [ifiles]
+    if not isinstance(ifiles, list):
+        ifiles = [ifiles]
     nfiles = len(ifiles)
+
     if nfiles < 1:
         raise Exception("No files to check")
 
@@ -101,9 +103,12 @@ def main(ifiles, odir):
     else:
         filenames = [ifiles]
 
+    dataset = []
     for f in filenames:
+        dataset.append(Dataset(f))
 
-        res = test_check_multifile_temporal_continuity(Dataset(f))
+    res = test_check_multifile_temporal_continuity(dataset)
+    for f in filenames:
         write_results(f, res, odir)
 
 if __name__ == '__main__':

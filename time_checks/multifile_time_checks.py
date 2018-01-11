@@ -27,7 +27,6 @@ def check_multifile_temporal_continuity(dss, time_index_in_name=-1, frequency_in
     :param frequency_index: index of the frequency component in the file names
     :return: Boolean (Success or Failure)
     """
-
     err_msg = ""
 
     # Sort the datasets by file name just in case files have been provided in a strange order
