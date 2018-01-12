@@ -19,14 +19,6 @@ from time_checks.utils import resolve_dataset_type
 from time_checks import utils, time_utils, settings, constants
 from time_checks.multifile_time_checks import check_multifile_temporal_continuity
 
-
-# python run_multifile_timechecks.py ../test_data/cmip5/ua_day_IPSL-CM5A-LR_historical_r1i1p1_19500101-19591231.nc  ../test_data/cmip5/ua_day_IPSL-CM5A-LR_historical_r1i1p1_19800101-19891231.nc ../test_data/cmip5/ua_day_IPSL-CM5A-LR_historical_r1i1p1_19600101-19691231.nc  ../test_data/cmip5/ua_day_IPSL-CM5A-LR_historical_r1i1p1_19900101-19991231.nc ../test_data/cmip5/ua_day_IPSL-CM5A-LR_historical_r1i1p1_19700101-19791231.nc  ../test_data/cmip5/ua_day_IPSL-CM5A-LR_historical_r1i1p1_20000101-20051231.nc
-# test for single file is ok
-"""
-file = '/badc/cmip5/data/cmip5/output1/MOHC/HadGEM2-ES/historical/day/atmos/day/r1i1p1/latest/zg/zg_day_HadGEM2-ES_historical_r1i1p1_19801201-19851130.nc'
-is part of a timeseries and this falls over...
-"""
-
 @resolve_dataset_type
 def test_check_multifile_temporal_continuity(files):
 
@@ -38,81 +30,28 @@ def test_check_multifile_temporal_continuity(files):
         return "T1.006: [check_multifile_temporal_continuity]: OK"
 
 
-
-def is_part_of_timeseries(ifile):
-
-    msg = ""
-    if os.path.isdir(os.path.dirname(ifile)):
-
-        if len(os.listdir(os.path.dirname(ifile))) > 1:
-            ts = True
-        else:
-            ts = False
-            msg = "Single file in timeseries or fx"
-    else:
-        ts = False
-        msg = "Path error"
-        
-    return ts, msg
-
-
-
-def write_results(filenames, res, odir):
-
-    filenames = [filenames]
-
-    for f in filenames:
-        institute, model, experiment, frequency, realm, table, ensemble, version, variable, ncfile = f.split('/')[6:]
-        logfile = os.path.join(odir, ncfile.replace('.nc', '__file_timecheck.log'))
-        
-        if os.path.isfile(logfile):
-            with open(logfile, 'a') as w:
-                w.writelines([res, '\n'])
-
-        else:
-            if not os.path.isdir(odir):
-                os.makedirs(odir)
-            with open(logfile, 'w+') as w:
-                w.writelines([res, '\n'])
-
 def main(ifiles, odir):
 
-    if not isinstance(ifiles, list):
-        ifiles = [ifiles]
-    nfiles = len(ifiles)
-
-    if nfiles < 1:
-        raise Exception("No files to check")
-
-    if nfiles == 1:
-
-        fname = ifiles[0]
-        ts, msg = is_part_of_timeseries(fname)
-
-        if ts:
-            dirname = os.path.dirname(fname)
-            fnames = os.listdir(dirname)
-            filenames = []
-            for f in fnames:
-                filenames.append(os.path.join(dirname, f))
-
-        else:
-            res = "T1.006: [check_multifile_temporal_continuity]: " + msg
-            write_results(fname, res, odir)
-            return
-    else:
-        filenames = [ifiles]
-
     dataset = []
-    for f in filenames:
+    for f in ifiles:
         dataset.append(Dataset(f))
 
     res = test_check_multifile_temporal_continuity(dataset)
-    for f in filenames:
-        write_results(f, res, odir)
+    institute, model, experiment, frequency, realm, table, ensemble, version, variable, ncfile = ifiles[0].split('/')[6:]
+    logdir = os.path.join(odir, institute, model, experiment, frequency, realm, version)
+    logfile = os.path.join(logdir, ncfile.replace('.nc', '__multifile_timecheck.log'))
+
+    if not os.path.isdir(logdir):
+        os.makedirs(logdir)
+
+    with open(logfile, 'w+') as w:
+        w.writelines([res, '\n'])
+        w.writelines([' ', '\n'])
+        w.writelines(["Multifile time check on files:", '\n'])
+        for f in ifiles:
+            w.writelines([f, '\n'])
 
 if __name__ == '__main__':
 
     ifiles = argv[1:]
-    odir = "./"
-    main(ifiles, odir)
+    main(ifiles, odir='./')
