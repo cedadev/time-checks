@@ -186,6 +186,7 @@ def get_nc_datetime(time_comp, units, calendar):
     :param calendar: calendar [string]
     :return: a netcdftime object.
     """
+
     t = cf_units.num2date(time_comp, units, calendar)
     return t
 
@@ -365,6 +366,7 @@ class TimeSeries(object):
         if self.delta.unit == "year":
             self._generate_time_series_year_delta(start, end)
         elif self.delta.unit == "month":
+            import pdb; pdb.set_trace()
             self._generate_time_series_month_delta(start, end)
         # In all other cases we use NetCDF datetime objects and their operations
         else:
@@ -428,6 +430,7 @@ class TimeSeries(object):
         :return: netCDF Time object (aware of calendars)
         """
         value = cf_units.date2num(anytime, self.base_time_unit, self.calendar)
+        
         return get_nc_datetime(value, self.base_time_unit, self.calendar)
 
 

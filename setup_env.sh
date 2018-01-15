@@ -1,2 +1,2 @@
-. venv/bin/activate
+. timechecks_venv/bin/activate
 export PYTHONPATH=.
