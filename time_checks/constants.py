@@ -24,7 +24,7 @@ FREQUENCY_MAPPINGS = {
     'OImon': (1, 'month'),
     'Omon': (1, 'month'),
     'Oyr': (1, 'year'),
-    'aero': None,
+    'aero': (1, 'month'), # aero only has monthly data
     'cf3hr': (3, 'hour'),
     'cfDay': (1, 'day'),
     'cfMon': (1, 'month'),

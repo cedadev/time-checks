@@ -32,17 +32,25 @@ def test_check_multifile_temporal_continuity(files):
 
 def main(ifiles, odir):
 
-    dataset = []
-    for f in ifiles:
-        dataset.append(Dataset(f))
-
-    res = test_check_multifile_temporal_continuity(dataset)
     institute, model, experiment, frequency, realm, table, ensemble, version, variable, ncfile = ifiles[0].split('/')[6:]
     logdir = os.path.join(odir, institute, model, experiment, frequency, realm, version)
     logfile = os.path.join(logdir, ncfile.replace('.nc', '__multifile_timecheck.log'))
 
     if not os.path.isdir(logdir):
         os.makedirs(logdir)
+
+    dataset = []
+    for f in ifiles:
+        try:
+            dataset.append(Dataset(f))
+        except IOError:
+            with open(logfile, 'w+') as w:
+                w.writelines(["Error could not perform multifile timechecks", '\n'])
+                w.writelines(['File: ', f,  '\n'])
+                w.writelines(["Has IOError, (NetCDF unknown format)", '\n'])
+            return
+
+    res = test_check_multifile_temporal_continuity(dataset)
 
     with open(logfile, 'w+') as w:
         w.writelines([res, '\n'])
