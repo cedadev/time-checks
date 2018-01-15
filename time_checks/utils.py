@@ -366,7 +366,6 @@ class TimeSeries(object):
         if self.delta.unit == "year":
             self._generate_time_series_year_delta(start, end)
         elif self.delta.unit == "month":
-            import pdb; pdb.set_trace()
             self._generate_time_series_month_delta(start, end)
         # In all other cases we use NetCDF datetime objects and their operations
         else:
