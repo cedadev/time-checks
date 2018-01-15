@@ -43,11 +43,11 @@ def main(ifiles, odir):
     for f in ifiles:
         try:
             dataset.append(Dataset(f))
-        except IOError:
+        except IOError, err:
             with open(logfile, 'w+') as w:
                 w.writelines(["Error could not perform multifile timechecks", '\n'])
                 w.writelines(['File: ', f,  '\n'])
-                w.writelines(["Has IOError, (NetCDF unknown format)", '\n'])
+                w.writelines(["Has IOError, ({})".format(str(err)), '\n'])
             return
 
     res = test_check_multifile_temporal_continuity(dataset)

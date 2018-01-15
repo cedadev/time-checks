@@ -138,6 +138,14 @@ def test_check_multifile_temporal_continuity_6hr_fail_1():
     assert(result is False)
 
 
+def test_check_multifile_temporal_continuity_TypeError():
+    file_names = ['tas_day_CMCC-CM_piControl_r1i1p1_17400101-17401231.nc',
+                  'tas_day_CMCC-CM_piControl_r1i1p1_17410101-17411231.nc']
+
+    result = _call_common_multifile_check(file_names)
+    assert(result is True)
+ 
+
 def test_check_multifile_temporal_continuity_julian_success():
     file_names = ['tas_Amon_GFDL-CM2p1_historical_r1i1p1_200101-200512.nc',
                   'tas_Amon_GFDL-CM2p1_historical_r1i1p1_200601-201012.nc',
