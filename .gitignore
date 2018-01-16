@@ -106,3 +106,5 @@ ENV/
 .mypy_cache/
 
 .idea
+
+setup_env.sh

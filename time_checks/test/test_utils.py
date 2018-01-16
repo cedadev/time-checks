@@ -148,3 +148,18 @@ def test_time_series_yearly_360_day_success():
     assert(len(s) == 6)
     assert(str(s[0]) == "2001-01-15 00:00:00")
     assert(str(s[-1]) == "2011-01-15 00:00:00")
+
+
+def test_proleptic_gregorian_day_out_of_range_for_month_error():
+    units = "days since 250-01-01 00:00:00.0"
+    calendar = "proleptic_gregorian"
+
+    for i in [18320, 18322]:
+        utils.get_nc_datetime(i, units, calendar)
+
+    # Now try known error: 0300-03-01 00:00:00 (1st March 300 has special properties)
+    try:
+        utils.get_nc_datetime(18321, units, calendar)
+    except:
+        print "Failed as expected for 1st March 300 for proleptic_gregorian calendar"
+
