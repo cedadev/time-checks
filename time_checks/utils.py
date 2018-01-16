@@ -186,6 +186,7 @@ def get_nc_datetime(time_comp, units, calendar):
     :param calendar: calendar [string]
     :return: a netcdftime object.
     """
+
     t = cf_units.num2date(time_comp, units, calendar)
     return t
 
@@ -428,6 +429,7 @@ class TimeSeries(object):
         :return: netCDF Time object (aware of calendars)
         """
         value = cf_units.date2num(anytime, self.base_time_unit, self.calendar)
+        
         return get_nc_datetime(value, self.base_time_unit, self.calendar)
 
 

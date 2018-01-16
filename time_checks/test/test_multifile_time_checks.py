@@ -34,7 +34,7 @@ def _call_common_multifile_check(file_list):
     for fpath in paths:
         print fpath
         datasets.append(Dataset(fpath))
-
+    
     result = check_multifile_temporal_continuity(datasets, time_index_in_name=-1)[0]
     return result
 
@@ -136,6 +136,25 @@ def test_check_multifile_temporal_continuity_6hr_fail_1():
 
     result = _call_common_multifile_check(file_names)
     assert(result is False)
+
+
+def test_check_multifile_temporal_continuity_TypeError_success_1():
+    file_names = ['tas_day_CMCC-CM_piControl_r1i1p1_15810101-15811231.nc',
+                  'tas_day_CMCC-CM_piControl_r1i1p1_15820101-15821231.nc',
+                  'tas_day_CMCC-CM_piControl_r1i1p1_15830101-15831231.nc',
+                  ]
+
+    result = _call_common_multifile_check(file_names)
+    assert(result is True)
+
+
+def test_check_multifile_temporal_continuity_ValueError_success_1():
+    file_names = ['tas_Amon_ACCESS1-3_piControl_r1i1p1_025001-049912.nc',
+                  'tas_Amon_ACCESS1-3_piControl_r1i1p1_050001-074912.nc',
+                  ]
+
+    result = _call_common_multifile_check(file_names)
+    assert (result is True)
 
 
 def test_check_multifile_temporal_continuity_julian_success():
