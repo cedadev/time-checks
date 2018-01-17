@@ -5,10 +5,9 @@ test_utils.py
 Tests for the `utils.py` module.
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from time_checks import utils
-from datetime import timedelta
 
 
 def test_get_nc_datetime_calendars_success():
@@ -150,7 +149,27 @@ def test_time_series_yearly_360_day_success():
     assert(str(s[-1]) == "2011-01-15 00:00:00")
 
 
+def test_get_nc_datetime_special_date_1st_March_300_success():
+    units = "days since 250-01-01 00:00:00.0"
+    calendar = "proleptic_gregorian"
+
+    day_before = utils.get_nc_datetime(18320, units, calendar)
+    day_after = utils.get_nc_datetime(18322, units, calendar)
+
+    # Set delta of 1 day
+    td = timedelta(1)
+
+    _day_before = day_before + td
+    _day_after = day_after - td
+
+    assert (_day_before == _day_after)
+
+    actual_day = utils.get_nc_datetime(18321, units, calendar)
+    assert (actual_day == _day_before)
+
+
 def test_proleptic_gregorian_day_out_of_range_for_month_error():
+    "Kind of repeats above test - with different emphasis."
     units = "days since 250-01-01 00:00:00.0"
     calendar = "proleptic_gregorian"
 

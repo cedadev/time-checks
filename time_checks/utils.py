@@ -1,7 +1,7 @@
 
 import os
 import re
-from datetime import timedelta
+from datetime import datetime, timedelta, date
 from functools import wraps
 
 import arrow
@@ -176,6 +176,60 @@ def _parse_time(tm):
     return arrow.get(formatted_time)
 
 
+def _resolve_special_date(time_comp, units, calendar):
+    """
+    Function to manage a set of "special" date/times that cause
+    errors/problems with the NetCDF libraries (sometimes for
+    valid reasons). Code to resolve those date/times is also
+    included so that we can work with them in this library.
+
+    For example: 1st March 300 is anomalous due to changes in
+    calendars used historically (e.g. "proleptic_gregorian",
+    "gregorian" etc). As a result the NetCDF libraries fail
+    to manage this date properly when we call `get_nc_datetime`
+    to generate it. However, we can be clever and generate it
+    by creating the `datetime` 1 day before and then subtracting
+    the timedelta of 1 day.
+
+    :param time_comp: time value [integer]
+    :param units: time units [string]
+    :param calendar: calendar [string]
+    :return: a netcdftime/datetime object.
+    """
+    _SPECIAL_DATES = [date(300, 3, 1)]
+
+    # Simple function to match dates by attributes
+    def _dates_are_equal(d1, d2):
+        for key in ('year', 'month', 'day'):
+            if getattr(d1, key) != getattr(d2, key):
+                return False
+
+        return True
+
+    # subtract 1 day from time_comp and try to generate datetime
+    # then add 1 day on
+    time_unit = units.split()[0]
+    unit_map = {'days': 1, 'hours': 24, 'minutes': 3600, 'seconds': 86400}
+
+    if time_unit not in unit_map:
+        raise Exception("Time unit not recognised: {}".format(time_unit))
+
+    time_comp -= unit_map[time_unit]
+
+    # Now use day before to try to generate valid datetime
+    day_before = cf_units.num2date(time_comp, units, calendar)
+
+    # And add a day
+    t = day_before + timedelta(1)
+
+    # Now check this is a special date and return if it is
+    for _date in _SPECIAL_DATES:
+        if _dates_are_equal(_date, t):
+            return t
+
+    raise Exception("Cannot resolve date.")
+
+
 def get_nc_datetime(time_comp, units, calendar):
     """
     Returns a time object from netcdftime library. Type can be a number of date time
@@ -184,17 +238,27 @@ def get_nc_datetime(time_comp, units, calendar):
     :param time_comp: time value [integer]
     :param units: time units [string]
     :param calendar: calendar [string]
-    :return: a netcdftime object.
+    :return: a netcdftime/datetime object.
     """
+    err_msg = "Cannot resolve date/time from: {} {} (calendar: {}).".format(
+                time_comp, units, calendar)
 
-    t = cf_units.num2date(time_comp, units, calendar)
+    try:
+        t = cf_units.num2date(time_comp, units, calendar)
+    except ValueError, err:
+        if err.message == 'day is out of range for month':
+            try:
+                t = _resolve_special_date(time_comp, units, calendar)
+            except:
+                raise Exception(err_msg)
+        else:
+            raise Exception(err_msg)
+
     return t
 
 
 def _times_match_within_tolerance(t1, t2, tolerance="days:1"):
     """
-        _times_match_within_tolerance
-
     Compares two datetime arrow objects and returns True if they match
     within the time period specified in `tolerance`.
 
@@ -433,6 +497,31 @@ class TimeSeries(object):
         return get_nc_datetime(value, self.base_time_unit, self.calendar)
 
 
+    def _before_or_equal_to_wrapper(self, t1, t2):
+        """
+        Wrapper script to catch Exceptions when two datetime objects are compared
+        with `t1 <= t2`. Some time series will generate different datetime
+        objects which raise an Exception such as:
+            "TypeError: cannot compare netcdftime._netcdftime.Datetime ..."
+
+        This code catches the Exception and does a comparison of each component
+        rather than the entire object.
+
+        Return True if t1 is before or equal to t2.
+
+        :param t1: a netcdftime or datetime object
+        :param t2: a netcdftime or datetime object
+        :return: boolean
+        """
+        try:
+            return t1 <= t2
+        except TypeError, err:
+            keys = ('year', 'month', 'day', 'hour', 'minute', 'second')
+            t1_comps = [getattr(t1, key) for key in keys]
+            t2_comps = [getattr(t2, key) for key in keys]
+            return t1_comps <= t2_comps
+
+
     def _generate_time_series(self, start, end):
         """
         Generates time series and stores in `self.series`
@@ -445,7 +534,7 @@ class TimeSeries(object):
         delta = self._resolve_delta()
         current_time = start
 
-        while current_time <= end:
+        while self._before_or_equal_to_wrapper(current_time, end): # current_time <= end:
             self.series.append(current_time)
 
             # Now increment
