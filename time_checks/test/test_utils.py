@@ -57,13 +57,51 @@ def test_add_to_netcdf_datetime_success():
 
 
 def test_add_to_netcdf_datetime_for_all_calendars_success():
-    # TODO: Ruth to create simple test for each calendar type here
-    # E.g.
-    x = utils.get_nc_datetime(27, "days since 1999-02-01 00:00:00", calendar="360_day")
-    res = x + timedelta(2.5)
-    assert(str(res) == "1999-02-30 12:00:00")
-    # And one for calendar
-    #...
+    """
+    Tests that the transition at end of February for all CMIP5 calendars
+    ['gregorian', 'standard', 'proleptic_gregorian', 'noleap', '365_day', 'julian', 'all_leap', '366_day', '360_day']
+    works as expected for leap and non-leap years.
+    """
+
+
+    leap_year = "days since 2000-02-01 00:00:00"
+    not_leap_year = "days since 1999-02-01 00:00:00"
+
+    for calendar in ['gregorian', 'standard', 'proleptic_gregorian', 'noleap', '365_day', 'julian', ]:
+        x = utils.get_nc_datetime(27, not_leap_year, calendar=calendar)
+        res = x + timedelta(2.5)
+        assert(str(res) == "1999-03-02 12:00:00")
+
+    for calendar in ['all_leap', '366_day']:
+        x = utils.get_nc_datetime(27, not_leap_year, calendar=calendar)
+        res = x + timedelta(2.5)
+        assert(str(res) == "1999-03-01 12:00:00")
+
+    for calendar in ['360_day']:
+        x = utils.get_nc_datetime(27, not_leap_year, calendar=calendar)
+        res = x + timedelta(2.5)
+        assert(str(res) == "1999-02-30 12:00:00")
+
+    for calendar in ['gregorian', 'standard', 'proleptic_gregorian', 'julian']:
+        x = utils.get_nc_datetime(27, leap_year, calendar=calendar)
+        res = x + timedelta(2.5)
+        assert(str(res) == "2000-03-01 12:00:00")
+
+    for calendar in ['noleap', '365_day']:
+        x = utils.get_nc_datetime(27, leap_year, calendar=calendar)
+        res = x + timedelta(2.5)
+        assert(str(res) == "2000-03-02 12:00:00")
+
+    for calendar in ['all_leap', '366_day']:
+        x = utils.get_nc_datetime(27, leap_year, calendar=calendar)
+        res = x + timedelta(2.5)
+        assert(str(res) == "2000-03-01 12:00:00")
+
+    for calendar in ['360_day']:
+        x = utils.get_nc_datetime(27, leap_year, calendar=calendar)
+        res = x + timedelta(2.5)
+        assert(str(res) == "2000-02-30 12:00:00")
+
 
 
 def test_time_series_type_checks():
