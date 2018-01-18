@@ -138,7 +138,11 @@ def test_check_regular_time_axis_increments_success_1():
         assert(check_regular_time_axis_increments(ds, frequency_index=1)[0] is True)
 
 def test_check_regular_time_axis_increments_fail_1():
-    files = ['test_data/cmip5/mrsos_day_HadGEM2-ES_historical_r2i1p1_19991201-20051130.nc',]
+    files = ['test_data/cmip5/mrsos_day_HadGEM2-ES_historical_r2i1p1_19991201-20051130.nc',
+             'test_data/cmip6/ua_EdayZ_HadGEM3-GC31-LL_ssp246_r1i1p1f1_gn_19790101-19971230.nc',
+             'test_data/cmip6/ua_EdayZ_HadGEM3-GC31-LL_ssp245_r1i1p1f1_gn_19790101-19971230.nc',
+             'test_data/cmip6/ua_EdayZ_HadGEM3-GC31-LL_ssp247_r1i1p1f1_gn_19790101-19971230.nc']
+
     for f in files:
         ds = Dataset(f)
         assert(check_regular_time_axis_increments(ds, frequency_index=1)[0] is False)
