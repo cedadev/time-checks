@@ -69,7 +69,7 @@ def check_multifile_temporal_continuity(dss, time_index_in_name=-1, frequency_in
 
             dt = series[0]
 
-            if f_series[0] == dt:
+            if utils.compare(f_series[0], "==", dt):
                 f_series.remove(dt)
                 series.remove(dt)
             else:

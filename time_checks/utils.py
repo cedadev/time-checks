@@ -335,6 +335,10 @@ class DateTimeAnyTime(object):
     def __repr__(self):
         return str(self)
 
+    def __eq__(self, other):
+        this, other = self._components, other._components
+        return this == other
+
     def __gt__(self, other):
         this, other = self._components, other._components
         return this > other
@@ -351,6 +355,55 @@ class DateTimeAnyTime(object):
         this, other = self._components, other._components
         return this <= other
 
+
+def time_object_to_anytime(dt):
+    """
+    Converts any date/time object that has attributes of 'year', 'month', ...
+    ..., 'second' to a DateTimeAnyTime object. Input times might be those from
+    the netcdftime library or a simple datetime.
+
+    :param dt: some kind of date/time object
+    :return: a DateTimeAnyTime instance
+    """
+    keys = ('year', 'month', 'day', 'hour', 'minute', 'second')
+    return DateTimeAnyTime(*[getattr(dt, key) for key in keys])
+
+
+def safe_datetime_comparison(dt1, comparison, dt2):
+    """
+    Casts both date/time objects to DateTimeAnyTime instances so that comparisons
+    will work.
+
+    :param dt1: some kind of date/time object
+    :param comparison: string for comparison, one of "<", "<=", "==", ">", ">="
+    :param dt2: some kind of date/time object
+    :return: boolean
+    """
+    comp_string = "dt1 {} dt2".format(comparison)
+
+    # Try run it normally, but proceed if Exception raised
+    try:
+        return eval(comp_string)
+    except Exception:
+        pass
+
+    adt1 = time_object_to_anytime(dt1)
+    adt2 = time_object_to_anytime(dt2)
+
+    comp_string = "adt1 {} adt2".format(comparison)
+    return eval(comp_string)
+
+
+def compare(dt1, comparison, dt2):
+    """
+    Alias to safe_datetime_comparison.
+
+    :param dt1: some kind of date/time object
+    :param comparison: string for comparison, one of "<", "<=", "==", ">", ">="
+    :param dt2: some kind of date/time object
+    :return: boolean
+    """
+    return safe_datetime_comparison(dt1, comparison, dt2)
 
 def str_to_anytime(dt):
     """
@@ -513,13 +566,7 @@ class TimeSeries(object):
         :param t2: a netcdftime or datetime object
         :return: boolean
         """
-        try:
-            return t1 <= t2
-        except TypeError, err:
-            keys = ('year', 'month', 'day', 'hour', 'minute', 'second')
-            t1_comps = [getattr(t1, key) for key in keys]
-            t2_comps = [getattr(t2, key) for key in keys]
-            return t1_comps <= t2_comps
+        return compare(t1, "<=", t2)
 
 
     def _generate_time_series(self, start, end):

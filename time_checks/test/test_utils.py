@@ -45,6 +45,18 @@ def test_str_to_anytime_failures():
             raise Exception("DateTimeAnyTime object created from invalid value: {}".format(dt))
 
 
+def test_time_object_to_anytime_success():
+    matches = [((0, "days since 1580-1-1", "gregorian"), (1580, 1, 1, 0, 0, 0, 0)),
+               ((0, "days since 1580-1-1", "proleptic_gregorian"), (1580, 1, 1, 0, 0, 0, 0)),
+               ((0, "days since 1580-1-1", "standard"), (1580, 1, 1, 0, 0, 0, 0))
+               ]
+
+    for dt_args, components in matches:
+        dt = utils.get_nc_datetime(*dt_args)
+        anytime = utils.time_object_to_anytime(dt)
+        assert(anytime._components == components)
+
+
 def test_add_to_netcdf_datetime_success():
     x = utils.get_nc_datetime(27, "days since 1999-02-01 00:00:00", calendar="360_day")
     # Set time delta, test that sending seconds and microseconds is optional
