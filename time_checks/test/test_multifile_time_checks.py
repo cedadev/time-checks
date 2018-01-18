@@ -60,6 +60,47 @@ def test_check_multifile_temporal_continuity_monthly_fail_1():
     assert(result is False)
 
 
+def test_check_multifile_temporal_continuity_monthly_fail_2():
+    file_names = [#'sim_OImon_CMCC-CM_piControl_r1i1p1_155001-155912.nc',
+                  #'sim_OImon_CMCC-CM_piControl_r1i1p1_156001-156912.nc',
+                  'sim_OImon_CMCC-CM_piControl_r1i1p1_157001-157912.nc',
+                  'sim_OImon_CMCC-CM_piControl_r1i1p1_159001-159912.nc',
+                  #'sim_OImon_CMCC-CM_piControl_r1i1p1_160001-160912.nc',
+                  #'sim_OImon_CMCC-CM_piControl_r1i1p1_161001-161912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_162001-162912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_163001-163912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_164001-164912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_165001-165912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_166001-166912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_167001-167912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_168001-168912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_169001-169912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_170001-170912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_171001-171912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_172001-172912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_173001-173912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_174001-174912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_175001-175912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_176001-176912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_177001-177912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_178001-178912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_179001-179912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_180001-180912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_181001-181912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_182001-182912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_183001-183912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_184001-184912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_185001-185912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_186001-186912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_187001-187912.nc',
+                  # 'sim_OImon_CMCC-CM_piControl_r1i1p1_200001-200912.nc',
+                  ]
+
+    result = _call_common_multifile_check(file_names)
+    assert(result is False)
+
+
+
 def test_check_multifile_temporal_continuity_day_success_1():
     file_names = ['ua_day_IPSL-CM5A-LR_historical_r1i1p1_19500101-19591231.nc',
                   'ua_day_IPSL-CM5A-LR_historical_r1i1p1_19600101-19691231.nc',

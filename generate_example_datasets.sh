@@ -9,19 +9,21 @@ _6hr_files=/badc/cmip5/data/cmip5/output1/MOHC/HadGEM2-ES/rcp85/6hr/atmos/6hrPle
 TypeError_files=/badc/cmip5/data/cmip5/output1/CMCC/CMCC-CM/piControl/day/atmos/day/r1i1p1/v20120330/tas/tas_*.nc
 ValueError_files=/badc/cmip5/data/cmip5/output1/CSIRO-BOM/ACCESS1-3/piControl/mon/atmos/Amon/r1i1p1/v1/tas/tas_*.nc
 cmip6_eg_files=test_data/test_cases_qc/*/*.nc
-
-output_dir=test_data/cmip6
+TypeError2_files=/badc/cmip5/data/cmip5/output1/CMCC/CMCC-CM/piControl/mon/seaIce/OImon/r1i1p1/v20121113/sim/sim_*.nc
+output_dir=test_data/cmip5
 mkdir -p $output_dir
 
 # Define files variable as the files to convert this time
-files=$cmip6_eg_files
+files=$TypeError2_files
 
 for f in $files ; do
     fname=$(basename $f)
     var_id=$(echo $fname | cut -d_ -f1)
     output_file=$output_dir/$fname
 
+    lat_selector="-d lat,,,100"
     lon_selector="-d lon,,,100"
+
     extra=""
 
     # Add extra args for some cases
@@ -36,7 +38,7 @@ for f in $files ; do
     fi
 
     echo $var_id
-    cmd="ncks $extra -d lat,,,100 $lon_selector -v $var_id $f $output_file"
+    cmd="ncks $extra $lat_selector $lon_selector -v $var_id $f $output_file"
     echo "Running: $cmd"
     $cmd
     echo "Wrote: $output_file"
