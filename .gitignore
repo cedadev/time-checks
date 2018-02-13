@@ -2,6 +2,7 @@
 
 # User defined directories
 from_ag/
+timechecks_venv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
