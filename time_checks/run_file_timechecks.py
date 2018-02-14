@@ -46,6 +46,7 @@ def test_filename_extension(file):
 
 @resolve_dataset_type
 def test_check_file_name_time_format(ds):
+
     res, msg = check_file_name_time_format(ds)
     if res == False:
         return "T1.001: [check_file_name_time_format]: FAILED:: Format of file name is not recognised. " + msg
@@ -78,6 +79,9 @@ def test_check_time_format_matches_frequency(ds):
 def test_check_file_name_matches_time_var(ds):
 
     table = ds["filename"][1]
+    if table in ['Oyr']:
+        frequency = 'days'
+        limit = 180
     if table in ['Amon', 'Omon', 'Lmon', 'LImon', 'OImon', 'cfMon', 'aero']:
         frequency = 'days'
         limit = 16
