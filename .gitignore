@@ -1,4 +1,6 @@
+# User defined files
 *tesing*py
+*.log
 
 # User defined directories
 from_ag/
