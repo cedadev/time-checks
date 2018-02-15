@@ -85,7 +85,7 @@ def test_check_file_name_matches_time_var(ds):
     if table in ['Amon', 'Omon', 'Lmon', 'LImon', 'OImon', 'cfMon', 'aero']:
         frequency = 'days'
         limit = 16
-    if table in ['day', 'cfday']:
+    if table in ['day', 'cfday', 'cfDay']:
         frequency = 'days'
         limit = 1
     if table in ['6hrLev', '6hrPlev', '3hr', 'cf3hr']:
