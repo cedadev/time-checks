@@ -52,6 +52,7 @@ def test_check_file_name_matches_time_var_success_1():
         ds = Dataset(f)
         assert(check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:1')[0] is True)
 
+
 def test_check_file_name_matches_time_var_success_2():
 
     files = ['test_data/cmip5/tas_Amon_HadGEM2-ES_historical_r1i1p1_198412-200511.nc',
@@ -61,7 +62,6 @@ def test_check_file_name_matches_time_var_success_2():
     for f in files:
         ds = Dataset(f)
         assert(check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:16')[0] is True)
-
 
 
 def test_check_file_name_matches_time_var_fail_1():
