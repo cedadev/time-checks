@@ -4,7 +4,6 @@ import re
 from datetime import datetime, timedelta, date
 from functools import wraps
 
-import arrow
 import cf_units
 from netCDF4 import Dataset, num2date
 
@@ -47,10 +46,7 @@ def resolve_dataset_type(func):
     :return: ds [dictionary]
     """
 
-    print "In decorator"
-
     @wraps(func)
-
     def wrapper(datasets, **kwargs):
         # First argument can be a list/tuple of objects of a single one.
         # So convert all to a list
@@ -152,33 +148,6 @@ def _convert_dataset_to_dict(ds):
     return dict
 
 
-def _parse_time(tm):
-    """
-    Parses time component string to an arrow date time object.
-
-    :param tm: date-time [string]
-    :return: datetime [arrow object]
-    """
-    # If already formatted then just parse and return
-    if "-" in tm:
-        return arrow.get(tm)
-
-    # Otherwise, reformat then parse
-    padded_time = tm + "00000101000000"[len(tm):]
-    splits = [4, 2, 2, 2, 2, 2]
-    splits.reverse()  # so we can pop them off the end
-
-    items = []
-    while padded_time:
-        i = splits.pop()
-        item = padded_time[:i]
-        padded_time = padded_time[i:]
-        items.append(item)
-
-    formatted_time = "{}-{}-{}T{}:{}:{}".format(*items)
-    return arrow.get(formatted_time)
-
-
 def _resolve_special_date(time_comp, units, calendar):
     """
     Function to manage a set of "special" date/times that cause
@@ -262,14 +231,14 @@ def get_nc_datetime(time_comp, units, calendar):
 
 def _times_match_within_tolerance(t1, t2, tolerance="days:1"):
     """
-    Compares two datetime arrow objects and returns True if they match
+    Compares two datetime datetime/netcdf_time objects and returns True if they match
     within the time period specified in `tolerance`.
 
     Usually t1 is the start time as taken from the file
     Usually t2 is the start time as given by the filename
 
-    :param t1: datetime [arrow object]
-    :param t2: datetime [arrow object]
+    :param t1: datetime/netcdf_time object
+    :param t2: datetime/netcdf_time object
     :param tolerance: tolerance period [string]
     :return: boolean [True for success]
     """
@@ -281,17 +250,20 @@ def _times_match_within_tolerance(t1, t2, tolerance="days:1"):
     if t1 == t2:
         return True, return_msg
 
-    """
-    If time series starts on 01-01-0001 then subtracting the timedelta causes error as time goes BC 
-    Arrow only supprts AD times, therefore only check that the time in the filename is less than
-    time in the file with the given tolerance.
-    """
-    close_to_zero_ad = arrow.get(0001, 01, 17)
-    if t2 < close_to_zero_ad:
+    # If time series starts on 0001-01-01 then subtracting the timedelta causes error as time goes BC 
+    # Arrow only supprts AD times, therefore only check that the time in the filename is less than
+    # time in the file with the given tolerance.
+    if hasattr(t1, 'calendar'):
+        close_to_zero_AD = cf_units.num2date(17, "days since 0000-00-00 00:00:00", t1.calendar)
+    else:
+        close_to_zero_AD = datetime(1, 1, 17)
+
+    if t2 < close_to_zero_AD:
+
         if t2 < (t1 + delta):
             return_msg = "Time close to zero"
             return True, return_msg
-
+     
     if (t1 - delta) < t2 < (t1 + delta):
         return True, return_msg
 
@@ -444,6 +416,20 @@ def str_to_anytime(dt):
     return DateTimeAnyTime(*components)
 
 
+def anytime_to_netcdf_time(anytime, time_unit, calendar):
+    """
+    Converts the incoming DateTime/DateTimeAnyTime into a netCDF time object.
+    The base time unit and calendar set on the object are used.
+
+    :param anytime: an instance of DateTimeAnyTime or DateTime
+    :param time_unit: time units (string)
+    :param calendar: calendar (string)
+    :return: netCDF Time object (aware of calendars)
+    """
+    value = cf_units.date2num(anytime, time_unit, calendar)
+    return get_nc_datetime(value, time_unit, calendar)
+
+
 class TimeSeries(object):
     """
     TimeSeries class - able to generate a time series from a start, end, interval
@@ -540,19 +526,6 @@ class TimeSeries(object):
             return (self.delta.n / self.CONVERSION_FACTORS[('hour', 'day')], 0, 0)
 
 
-    def _get_as_netcdf_time(self, anytime):
-        """
-        Converts the incoming DateTime/DateTimeAnyTime into a netCDF time object.
-        The base time unit and calendar set on the object are used.
-
-        :param anytime: an instance of DateTimeAnyTime or DateTime
-        :return: netCDF Time object (aware of calendars)
-        """
-        value = cf_units.date2num(anytime, self.base_time_unit, self.calendar)
-        
-        return get_nc_datetime(value, self.base_time_unit, self.calendar)
-
-
     def _before_or_equal_to_wrapper(self, t1, t2):
         """
         Wrapper script to catch Exceptions when two datetime objects are compared
@@ -578,8 +551,8 @@ class TimeSeries(object):
 
         :return: None
         """
-        start = self._get_as_netcdf_time(start)
-        end = self._get_as_netcdf_time(end)
+        start = anytime_to_netcdf_time(start, self.base_time_unit, self.calendar)
+        end = anytime_to_netcdf_time(end, self.base_time_unit, self.calendar)
 
         delta = self._resolve_delta()
         current_time = start
@@ -601,7 +574,7 @@ class TimeSeries(object):
         current_time = start
 
         while current_time <= end:
-            self.series.append(self._get_as_netcdf_time(current_time))
+            self.series.append(anytime_to_netcdf_time(current_time, self.base_time_unit, self.calendar))
 
             # Now increment
             current_time.month += self.delta.n
@@ -622,7 +595,7 @@ class TimeSeries(object):
         current_time = start
 
         while current_time <= end:
-            self.series.append(self._get_as_netcdf_time(current_time))
+            self.series.append(anytime_to_netcdf_time(current_time, self.base_time_unit, self.calendar))
 
             # Now increment
             current_time.year += self.delta.n

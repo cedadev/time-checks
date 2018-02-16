@@ -9,8 +9,8 @@ Checks whether the timeseries of datafiles is complete and contiguous.
 
 Returns message of [check_multifile_temporal_continuity]: OK/FAILED
 """
+
 import os
-import arrow
 from sys import argv
 from netCDF4 import Dataset, num2date
 
@@ -18,6 +18,7 @@ from time_checks import utils, constants
 from time_checks.utils import resolve_dataset_type
 from time_checks import utils, time_utils, settings, constants
 from time_checks.multifile_time_checks import check_multifile_temporal_continuity
+
 
 @resolve_dataset_type
 def test_check_multifile_temporal_continuity(files):
@@ -58,6 +59,7 @@ def main(ifiles, odir):
         w.writelines(["Multifile time check on files:", '\n'])
         for f in ifiles:
             w.writelines([f, '\n'])
+
 
 if __name__ == '__main__':
 

@@ -1,5 +1,4 @@
 netCDF4
-arrow
 cf_units
 
 ###################

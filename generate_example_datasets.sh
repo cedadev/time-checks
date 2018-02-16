@@ -10,11 +10,13 @@ TypeError_files=/badc/cmip5/data/cmip5/output1/CMCC/CMCC-CM/piControl/day/atmos/
 ValueError_files=/badc/cmip5/data/cmip5/output1/CSIRO-BOM/ACCESS1-3/piControl/mon/atmos/Amon/r1i1p1/v1/tas/tas_*.nc
 cmip6_eg_files=test_data/test_cases_qc/*/*.nc
 TypeError2_files=/badc/cmip5/data/cmip5/output1/CMCC/CMCC-CM/piControl/mon/seaIce/OImon/r1i1p1/v20121113/sim/sim_*.nc
+feb30th_in_name_file=/badc/cmip5/data/cmip5/output1/MOHC/HadGEM2-ES/esmControl/day/ocean/day/r1i1p1/latest/tos/tos_day_HadGEM2-ES_esmControl_r1i1p1_19200301-19300230.nc
+
 output_dir=test_data/cmip5
 mkdir -p $output_dir
 
 # Define files variable as the files to convert this time
-files=$TypeError2_files
+files=$feb30th_in_name_file
 
 for f in $files ; do
     fname=$(basename $f)
@@ -28,6 +30,8 @@ for f in $files ; do
 
     # Add extra args for some cases
     if [[ $fname =~ "piControl" ]]; then
+        extra=""
+    elif [[ $fname =~ "esmControl" ]]; then
         extra=""
     elif [[ $fname =~ "day" ]]; then
         extra="-d plev,,,8"

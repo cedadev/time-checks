@@ -6,6 +6,7 @@ Tests for the checks in the `file_time_checks.py` module.
 """
 
 from netCDF4 import Dataset
+import cf_units
 
 from time_checks.file_time_checks import *
 from time_checks.test.mock_netcdf import MockNCDataset
@@ -45,6 +46,7 @@ def test_check_file_name_matches_time_var_success_1():
 
     files = ['test_data/cmip5/mrsos_day_HadGEM2-ES_historical_r1i1p1_19991201-20051130.nc',
              'test_data/cmip5/mrsos_day_HadGEM2-ES_historical_r1i1p1_19991201-20051130.nc',
+             'test_data/cmip5/tos_day_HadGEM2-ES_esmControl_r1i1p1_19200301-19300230.nc'
             ]
     for f in files:
         ds = Dataset(f)
@@ -72,7 +74,18 @@ def test_check_file_name_matches_time_var_fail_2():
     This file has a units error
     """
     ds = Dataset('test_data/cmip5/zos_Omon_FGOALS-g2_historical_r1i1p1_195001-199912.nc')
-    assert(check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:16')[0] is False)
+    try:
+        res = check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:16')
+    except TypeError as err:
+        assert(str(err) == "int() argument must be a string or a number, not 'NoneType'")
+
+
+def test_date2num_fails_bad_units_string_fail():
+    "NOTE: This example comes from file: test_data/cmip5/zos_Omon_FGOALS-g2_historical_r1i1p1_195001-199912.nc"
+    try:
+        cf_units.date2num("1950-01-01 00:00:00.0", "days since 0001-01", "noleap")
+    except TypeError as err:
+        assert(str(err) == "int() argument must be a string or a number, not 'NoneType'") 
 
 
 def test_check_time_format_matches_frequency_success_1():

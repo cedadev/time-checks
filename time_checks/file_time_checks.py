@@ -6,7 +6,6 @@ A set of tests that operate at the file level.
 
 """
 
-import arrow
 from netCDF4 import Dataset, num2date
 
 from time_checks import utils, constants
@@ -50,8 +49,6 @@ def check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:
     index `time_index_in_name` when the name is split by "_" and the extension
     removed. The checks are done within the tolerance level specified.
 
-    Note times returned from arrow.get(tm.strftime) must be [<type 'netcdftime._netcdf...'>] objects
-
     :param ds: input dataset [netCDF4 Dataset object (also MockNCDataset) or compliant dictionary]
     :param time_index_in_name: index of time component in the file name [int]
     :param tolerance: tolerance of time difference allowed in match [string]
@@ -59,32 +56,29 @@ def check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:
     """
     return_msg = ""
 
-    import pdb; pdb.set_trace()
-
     time_var = ds["time"]["_data"]
     time_comp = ds['filename'][time_index_in_name]
     calendar = ds["time"]["calendar"]
+    units = ds['time']['units']
 
-    file_times = [utils._parse_time(comp) for comp in time_comp.split("-")]
+    file_times = [utils.str_to_anytime(comp) for comp in time_comp.split("-")]
+    file_times = [utils.anytime_to_netcdf_time(tm, units, calendar) for tm in file_times]
+
     start_time = time_var[0]
     end_time = time_var[-1]
-    units = ds['time']['units']
+
     if len(units.strip("days since ")) == 7:
         return False, "Format of units is incorrect, it is of the form 'days since YYYY-MM'," \
                       " it should be of the form 'YYYY-MM-DD'"
+
     times = num2date([start_time, end_time], units, calendar=calendar)
+    to_compare = [(times[0], file_times[0]), (times[1], file_times[1])]
 
-    [tm.timetuple() for tm in times]
-    t_start, t_end = [arrow.get("{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(*tm.timetuple()[:6])) for tm in times]
-    #    t_start, t_end = [arrow.get(tm.strftime('%Y-%m-%d %H:%M:%S')) for tm in times]
-    stopp
-    result, return_msg = utils._times_match_within_tolerance(t_start, file_times[0], tolerance)
-    if result == False:
-        return False, return_msg
+    for tm_1, tm_2 in to_compare:
+        result, return_msg = utils._times_match_within_tolerance(tm_1, tm_2, tolerance)
 
-    result, return_msg = utils._times_match_within_tolerance(t_end, file_times[1], tolerance)
-    if result == False:
-        return False, return_msg
+        if result == False:
+            return False, return_msg
 
     return True, return_msg
 

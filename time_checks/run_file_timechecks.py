@@ -1,6 +1,6 @@
 """
 run_file_timechecks.py
-==================
+======================
 
 A wrapper to file_time_checks.py which takes 1:n .nc files and then
 calls the time checks in given order.
@@ -23,7 +23,6 @@ T1.005: [regular_time_axis_increments]
 
 """
 import os
-import arrow
 from sys import argv
 from netCDF4 import Dataset, num2date
 
@@ -36,13 +35,14 @@ from time_checks.file_time_checks import check_time_format_matches_frequency
 from time_checks.file_time_checks import check_valid_temporal_element
 from time_checks.file_time_checks import check_regular_time_axis_increments
 
+
 def test_filename_extension(file):
 
     if not file.endswith('.nc'):
         return "T1.000: [file_extension]: File does not end with '.nc'"
-        # raise Exception("File does not end with '.nc'. Exiting time checks")
     else:
         return "T1.000: [file_extension]: OK"
+
 
 @resolve_dataset_type
 def test_check_file_name_time_format(ds):
@@ -110,6 +110,7 @@ def test_check_regular_time_axis_increments(ds):
     else:
         return "T1.005: [regular_time_axis_increments]: OK"
 
+
 def main(ifile, odir):
     """
      main() calls all the functions within this script
@@ -148,6 +149,9 @@ def main(ifile, odir):
 if __name__ == '__main__':
 
     ifile = argv[1]
-    odir = argv[2]
+    odir = "."
+
+    if len(argv) > 2:
+        odir = argv[2]
 
     main(ifile, odir)

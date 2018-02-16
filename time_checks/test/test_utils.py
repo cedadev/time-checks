@@ -22,10 +22,11 @@ def test_get_nc_datetime_calendars_success():
 
 
 def test_str_to_anytime_successes():
-    for dt in ("1999-01-01", "1999", "199901010000", "1999-01-01T00:00:00.000"):
+    for dt in ("1999-01-01", "1999", "19990101", "199901010000", "1999-01-01T00:00:00.000"):
         resp = utils.str_to_anytime(dt)
         assert(resp._components == (1999, 1, 1, 0, 0, 0, 0))
 
+    assert(utils.str_to_anytime("19300230")._components == (1930, 2, 30, 0, 0, 0, 0))
 
 def test_str_to_anytime_microsecond():
     dt = "1999-01-01T00:00:00.012"
