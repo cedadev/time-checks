@@ -92,9 +92,8 @@ def test_check_file_name_matches_time_var(ds):
         frequency = 'hours'
         limit = 1
 
-
     tolerance = "{}:{}".format(frequency, limit)
-
+    
     res, msg = check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance=tolerance)
     if res == False:
         return "T1.004: [file_name_matches_time_var]: FAILED:: " \

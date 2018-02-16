@@ -1,4 +1,0 @@
-#!/group_workspaces/jasmin/cedaproc/rpetrie/cmip5-timechecks/time-checks/cmip5_timechecks_venv/bin/python
-# EASY-INSTALL-SCRIPT: 'numpy==1.14.0','f2py'
-__requires__ = 'numpy==1.14.0'
-__import__('pkg_resources').run_script('numpy==1.14.0', 'f2py')

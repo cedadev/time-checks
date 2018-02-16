@@ -46,6 +46,9 @@ def resolve_dataset_type(func):
     :param ds: a dataset object [type analysed here]
     :return: ds [dictionary]
     """
+
+    print "In decorator"
+
     @wraps(func)
 
     def wrapper(datasets, **kwargs):

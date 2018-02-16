@@ -59,6 +59,8 @@ def check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:
     """
     return_msg = ""
 
+    import pdb; pdb.set_trace()
+
     time_var = ds["time"]["_data"]
     time_comp = ds['filename'][time_index_in_name]
     calendar = ds["time"]["calendar"]
@@ -75,7 +77,7 @@ def check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:
     [tm.timetuple() for tm in times]
     t_start, t_end = [arrow.get("{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(*tm.timetuple()[:6])) for tm in times]
     #    t_start, t_end = [arrow.get(tm.strftime('%Y-%m-%d %H:%M:%S')) for tm in times]
-
+    stopp
     result, return_msg = utils._times_match_within_tolerance(t_start, file_times[0], tolerance)
     if result == False:
         return False, return_msg
