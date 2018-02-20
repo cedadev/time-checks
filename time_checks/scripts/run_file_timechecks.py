@@ -149,6 +149,7 @@ def main(ifile, odir):
 if __name__ == '__main__':
 
     ifile = argv[1]
+    # Set default odir to be local dir
     odir = "."
 
     if len(argv) > 2:
