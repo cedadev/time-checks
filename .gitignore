@@ -1,12 +1,13 @@
 # User defined files
 *tesing*py
 *.log
-
+.pan*
 # User defined directories
 from_ag/
 cmip5_timechecks_venv/
 *venv/
 venv/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
