@@ -66,7 +66,7 @@ def test_check_valid_temporal_element(ds):
 
 @resolve_dataset_type
 def test_check_time_format_matches_frequency(ds):
-
+ 
     res, msg = check_time_format_matches_frequency(ds, frequency_index=1, time_index_in_name=-1)
     if res == False:
         return "T1.003: [time_format_matches_frequency]: FAILED:: " \
