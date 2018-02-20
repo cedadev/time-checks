@@ -39,7 +39,7 @@ def main(ifiles, odir):
 
     if not os.path.isdir(logdir):
         os.makedirs(logdir)
-
+ 
     dataset = []
     for f in ifiles:
         try:
