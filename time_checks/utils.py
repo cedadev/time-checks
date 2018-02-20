@@ -31,7 +31,6 @@ def resolve_dataset_type(func):
     def wrapper(datasets, **kwargs):
         # First argument can be a list/tuple of objects of a single one.
         # So convert all to a list
-
         single_arg = False
         if type(datasets) not in (tuple, list):
             single_arg = True

@@ -29,6 +29,7 @@ def check_file_name_time_format(ds, time_index_in_name=-1):
     :param time_index_in_name: index of time component in the file name [int]
     :return: boolean (True for success).
     """
+
     return_msg = ""
     time_comp = ds['filename'][time_index_in_name]
 
@@ -104,9 +105,7 @@ def check_time_format_matches_frequency(ds, frequency_index=1, time_index_in_nam
     :param ds: input dataset [netCDF4 Dataset object (also MockNCDataset) or compliant dictionary]
     :return: boolean [True for success]
     """
-
-    print "made it to  check_time_format_matches_frequency"
-    
+   
     return_msg = ""
     time_comp = ds['filename'][time_index_in_name]
     frequency = ds['filename'][frequency_index]
