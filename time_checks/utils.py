@@ -10,25 +10,6 @@ from netCDF4 import Dataset, num2date
 from time_checks import time_utils, constants
 
 
-def get_start_end_freq(finfo, time_index_in_name=-1, frequency_index=1):
-    """
-    Returns a tuple of ((start, end), frequency) parsed from file name
-    or file name component list.
-
-    :param finfo: File name/path or file name component list
-    :param time_index_in_name: index of time component in file name
-    :param frequency_index: index of frequency component in file name
-    :return: Tuple of: ((start, end), frequency)
-    """
-    if type(finfo) is str:
-        fname = os.path.splitext(os.path.basename(finfo))[0]
-        finfo = fname.split("_")
-
-    start, end = finfo[time_index_in_name].split("-")
-    frequency = finfo[frequency_index]
-
-    return (start, end), frequency
-
 
 def resolve_dataset_type(func):
     """
@@ -50,6 +31,7 @@ def resolve_dataset_type(func):
     def wrapper(datasets, **kwargs):
         # First argument can be a list/tuple of objects of a single one.
         # So convert all to a list
+
         single_arg = False
         if type(datasets) not in (tuple, list):
             single_arg = True
@@ -78,6 +60,26 @@ def resolve_dataset_type(func):
             return func(converted_datasets, **kwargs)
     
     return wrapper
+
+
+def get_start_end_freq(finfo, time_index_in_name=-1, frequency_index=1):
+    """
+    Returns a tuple of ((start, end), frequency) parsed from file name
+    or file name component list.
+
+    :param finfo: File name/path or file name component list
+    :param time_index_in_name: index of time component in file name
+    :param frequency_index: index of frequency component in file name
+    :return: Tuple of: ((start, end), frequency)
+    """
+    if type(finfo) is str:
+        fname = os.path.splitext(os.path.basename(finfo))[0]
+        finfo = fname.split("_")
+
+    start, end = finfo[time_index_in_name].split("-")
+    frequency = finfo[frequency_index]
+
+    return (start, end), frequency
 
 
 def _get_nc_attr(var, attr, default=""):

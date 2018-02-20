@@ -104,6 +104,9 @@ def check_time_format_matches_frequency(ds, frequency_index=1, time_index_in_nam
     :param ds: input dataset [netCDF4 Dataset object (also MockNCDataset) or compliant dictionary]
     :return: boolean [True for success]
     """
+
+    print "made it to  check_time_format_matches_frequency"
+    
     return_msg = ""
     time_comp = ds['filename'][time_index_in_name]
     frequency = ds['filename'][frequency_index]
