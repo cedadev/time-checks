@@ -2,11 +2,14 @@
 *tesing*py
 *.log
 .pan*
+
+
 # User defined directories
 from_ag/
 cmip5_timechecks_venv/
 *venv/
 venv/
+.pytest_cache/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
