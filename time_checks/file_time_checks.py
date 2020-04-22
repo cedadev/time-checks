@@ -152,12 +152,12 @@ def check_valid_temporal_element(ds, time_index_in_name=-1):
             return False, return_msg
 
         if 'mm' in locals():
-            if mm > 12 or mm < 01:
+            if mm > 12 or mm < 0o1:
                 return_msg = "Month element out of range"
                 return False, return_msg
 
         if 'dd' in locals():
-            if dd > 31 or dd < 01:
+            if dd > 31 or dd < 0o1:
                 return_msg = "Day element out of range"
                 return False, return_msg
             # does not account for calendars where 31 may be invalid for a 360 day calendar

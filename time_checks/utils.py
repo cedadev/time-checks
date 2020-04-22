@@ -218,7 +218,7 @@ def get_nc_datetime(time_comp, units, calendar):
 
     try:
         t = cf_units.num2date(time_comp, units, calendar)
-    except ValueError, err:
+    except ValueError as err:
         if err.message == 'day is out of range for month':
             try:
                 t = _resolve_special_date(time_comp, units, calendar)
