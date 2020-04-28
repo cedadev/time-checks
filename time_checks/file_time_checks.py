@@ -147,28 +147,28 @@ def check_valid_temporal_element(ds, time_index_in_name=-1):
                         if length_time >= 12:
                             mn = int(time_element[10:12])
 
-        if yyyy > 4000 or yyyy < 0000:
+        if yyyy > 4000 or yyyy < 0:
             return_msg = "Year element out of range"
             return False, return_msg
 
         if 'mm' in locals():
-            if mm > 12 or mm < 0o1:
+            if mm > 12 or mm < 1:
                 return_msg = "Month element out of range"
                 return False, return_msg
 
         if 'dd' in locals():
-            if dd > 31 or dd < 0o1:
+            if dd > 31 or dd < 1:
                 return_msg = "Day element out of range"
                 return False, return_msg
             # does not account for calendars where 31 may be invalid for a 360 day calendar
 
         if 'hh' in locals():
-            if hh > 23 or hh < 00:
+            if hh > 23 or hh < 0:
                 return_msg = "Hour element out of range"
                 return False, return_msg
 
         if 'mn' in locals():
-            if mn > 59 or mn < 00:
+            if mn > 59 or mn < 0:
                 return_msg = "Minute element out of range"
                 return False, return_msg
 
