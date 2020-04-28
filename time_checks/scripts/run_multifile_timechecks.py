@@ -44,7 +44,7 @@ def main(ifiles, odir):
     for f in ifiles:
         try:
             dataset.append(Dataset(f))
-        except IOError, err:
+        except IOError as err:
             with open(logfile, 'w+') as w:
                 w.writelines(["Error could not perform multifile timechecks", '\n'])
                 w.writelines(['File: ', f,  '\n'])

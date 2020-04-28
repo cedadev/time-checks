@@ -32,7 +32,6 @@ def _call_common_multifile_check(file_list):
     datasets = []
 
     for fpath in paths:
-        print fpath
         datasets.append(Dataset(fpath))
     
     result = check_multifile_temporal_continuity(datasets, time_index_in_name=-1)[0]

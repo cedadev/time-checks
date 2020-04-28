@@ -77,7 +77,7 @@ def test_check_file_name_matches_time_var_fail_2():
     try:
         res = check_file_name_matches_time_var(ds, time_index_in_name=-1, tolerance='days:16')
     except TypeError as err:
-        assert(str(err) == "int() argument must be a string or a number, not 'NoneType'")
+        assert(str(err) == "int() argument must be a string, a bytes-like object or a number, not 'NoneType'")
 
 
 def test_date2num_fails_bad_units_string_fail():
@@ -85,7 +85,7 @@ def test_date2num_fails_bad_units_string_fail():
     try:
         cf_units.date2num("1950-01-01 00:00:00.0", "days since 0001-01", "noleap")
     except TypeError as err:
-        assert(str(err) == "int() argument must be a string or a number, not 'NoneType'") 
+        assert(str(err) == "int() argument must be a string, a bytes-like object or a number, not 'NoneType'")
 
 
 def test_check_time_format_matches_frequency_success_1():

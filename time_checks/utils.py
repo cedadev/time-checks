@@ -218,7 +218,7 @@ def get_nc_datetime(time_comp, units, calendar):
 
     try:
         t = cf_units.num2date(time_comp, units, calendar)
-    except ValueError, err:
+    except ValueError as err:
         if err.message == 'day is out of range for month':
             try:
                 t = _resolve_special_date(time_comp, units, calendar)
@@ -255,7 +255,7 @@ def _times_match_within_tolerance(t1, t2, tolerance="days:1"):
     # Arrow only supprts AD times, therefore only check that the time in the filename is less than
     # time in the file with the given tolerance.
     if hasattr(t1, 'calendar'):
-        close_to_zero_AD = cf_units.num2date(17, "days since 0000-00-00 00:00:00", t1.calendar)
+        close_to_zero_AD = cf_units.num2date(16, "days since 0001-01-01 00:00:00", t1.calendar)
     else:
         close_to_zero_AD = datetime(1, 1, 17)
 

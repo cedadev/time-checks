@@ -122,7 +122,7 @@ def test_time_series_type_checks():
     start = end = datetime(1999, 1, 1)
     try:
         utils.TimeSeries(start, end, (1, "day"), calendar="360_day")
-    except TypeError, err:
+    except TypeError as err:
         pass
 
     # Check DateTimeAnyTime is accepted
@@ -231,5 +231,5 @@ def test_proleptic_gregorian_day_out_of_range_for_month_error():
     try:
         utils.get_nc_datetime(18321, units, calendar)
     except:
-        print "Failed as expected for 1st March 300 for proleptic_gregorian calendar"
+        print("Failed as expected for 1st March 300 for proleptic_gregorian calendar")
 
