@@ -1,6 +1,4 @@
 netCDF4
-cf-units
-
 ###################
 # For testing:
 pytest

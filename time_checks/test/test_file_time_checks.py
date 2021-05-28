@@ -5,8 +5,7 @@ test_file_time_checks.py
 Tests for the checks in the `file_time_checks.py` module.
 """
 
-from netCDF4 import Dataset
-import cf_units
+from netCDF4 import Dataset, date2num
 
 from time_checks.file_time_checks import *
 from time_checks.test.mock_netcdf import MockNCDataset
@@ -83,7 +82,7 @@ def test_check_file_name_matches_time_var_fail_2():
 def test_date2num_fails_bad_units_string_fail():
     "NOTE: This example comes from file: test_data/cmip5/zos_Omon_FGOALS-g2_historical_r1i1p1_195001-199912.nc"
     try:
-        cf_units.date2num("1950-01-01 00:00:00.0", "days since 0001-01", "noleap")
+        date2num("1950-01-01 00:00:00.0", "days since 0001-01", "noleap")
     except TypeError as err:
         assert(str(err) == "int() argument must be a string, a bytes-like object or a number, not 'NoneType'")
 
