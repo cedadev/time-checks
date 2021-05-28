@@ -4,8 +4,7 @@ import re
 from datetime import datetime, timedelta, date
 from functools import wraps
 
-import cf_units
-from netCDF4 import Dataset, num2date
+from netCDF4 import Dataset, num2date, date2num
 
 from time_checks import time_utils, constants
 
@@ -190,7 +189,7 @@ def _resolve_special_date(time_comp, units, calendar):
     time_comp -= unit_map[time_unit]
 
     # Now use day before to try to generate valid datetime
-    day_before = cf_units.num2date(time_comp, units, calendar)
+    day_before = num2date(time_comp, units, calendar)
 
     # And add a day
     t = day_before + timedelta(1)
@@ -217,7 +216,7 @@ def get_nc_datetime(time_comp, units, calendar):
                 time_comp, units, calendar)
 
     try:
-        t = cf_units.num2date(time_comp, units, calendar)
+        t = num2date(time_comp, units, calendar)
     except ValueError as err:
         if err.message == 'day is out of range for month':
             try:
@@ -255,7 +254,7 @@ def _times_match_within_tolerance(t1, t2, tolerance="days:1"):
     # Arrow only supprts AD times, therefore only check that the time in the filename is less than
     # time in the file with the given tolerance.
     if hasattr(t1, 'calendar'):
-        close_to_zero_AD = cf_units.num2date(16, "days since 0001-01-01 00:00:00", t1.calendar)
+        close_to_zero_AD = num2date(16, "days since 0001-01-01 00:00:00", t1.calendar)
     else:
         close_to_zero_AD = datetime(1, 1, 17)
 
@@ -427,7 +426,7 @@ def anytime_to_netcdf_time(anytime, time_unit, calendar):
     :param calendar: calendar (string)
     :return: netCDF Time object (aware of calendars)
     """
-    value = cf_units.date2num(anytime, time_unit, calendar)
+    value = date2num(anytime, time_unit, calendar)
     return get_nc_datetime(value, time_unit, calendar)
 
 
