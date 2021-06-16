@@ -9,7 +9,6 @@ A set of tests that operate at the multiple file level.
 import re
 from datetime import timedelta
 from itertools import chain
-import cf_units
 
 from time_checks import utils
 from time_checks.utils import resolve_dataset_type
